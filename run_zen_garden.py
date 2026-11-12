@@ -5,13 +5,15 @@ from zen_garden import run
 
 from global_vars import INPUT_DATA_PATH
 
-CONFIG_PATH = Path("./config.yaml")
+PROJECT_DIR = Path(__file__).resolve().parent
+CONFIG_PATH = PROJECT_DIR / "config_dispatch_2023.yaml"
 
 CONFIG = {
     "analysis": {
         "dataset": str(INPUT_DATA_PATH),
         "objective": "total_cost",
         "sense": "min",
+        "folder_output": str(PROJECT_DIR / "outputs_dispatch_2023"),
     },
     "solver": {
         "name": "gurobi",

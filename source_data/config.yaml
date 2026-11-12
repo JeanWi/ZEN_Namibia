@@ -7,22 +7,24 @@ output_folder: null
 system:
   set_nodes:
     - NAM
-  reference_year: 2019
-  unaggregated_time_steps_per_year: 1
-  aggregated_time_steps_per_year: 1
+  reference_year: 2023
+  unaggregated_time_steps_per_year: 8760
+  aggregated_time_steps_per_year: 8760
   conduct_time_series_aggregation: false
-  optimized_years: 7
+  optimized_years: 1
   interval_between_years: 1
   use_rolling_horizon: false
   years_in_rolling_horizon: 1
+  # The 2023 run is a fixed-fleet operational snapshot, not a capacity-expansion run.
+  allow_investment: false
 
 # add technologies/carriers to the model (resolved to the custom classes in zen_namibia/elements/)
+# Natural gas is omitted until the model has sourced 2023 capacity and fuel data.
 elements:
   insert:
     energy_system: energy_system_namibia
     set_carriers:
       - electricity
-      - natural_gas
       - coal
       - diesel
     set_conversion_technologies:
@@ -31,7 +33,6 @@ elements:
       - hydro_turbine
       - diesel_generator
       - coal_steam_turbine
-      - natural_gas_turbine
 
 # settings that go into the energy_system folder
 energy_system:
@@ -42,11 +43,11 @@ energy_system:
       - km
       - kilotons
       - Euro
-      
+
     definitions:
       Euro:
         dimension: currency
         aliases:
           - EURO
           - Eur
-      
+

@@ -8,7 +8,7 @@ if TYPE_CHECKING:
 from zen_creator import Attribute, Carrier
 
 from zen_namibia.datasets.datasets.electricity_demand import ElectricityDemand
-from zen_namibia.datasets.datasets.namibia_baseline import NamibiaBaseline
+from zen_namibia.datasets.datasets.namibia_baseline import load_baseline
 
 
 class Electricity(Carrier):
@@ -39,7 +39,7 @@ class Electricity(Carrier):
 
     def _set_availability_import_yearly(self) -> Attribute:
         """Annual import cap from observed GWh, stored as MWh."""
-        baseline = NamibiaBaseline(self.source_path).data.set_index("year")
+        baseline = load_baseline(self.source_path).data.set_index("year")
         limits = baseline[["imports_gwh"]].rename(columns={"imports_gwh": "NAM"}) * 1000
         return Attribute(
             "availability_import_yearly", default_value=0.0,
@@ -48,7 +48,7 @@ class Electricity(Carrier):
 
     def _set_availability_export_yearly(self) -> Attribute:
         """Annual export cap from observed GWh, stored as MWh."""
-        baseline = NamibiaBaseline(self.source_path).data.set_index("year")
+        baseline = load_baseline(self.source_path).data.set_index("year")
         limits = baseline[["exports_gwh"]].rename(columns={"exports_gwh": "NAM"}) * 1000
         return Attribute(
             "availability_export_yearly", default_value=0.0,

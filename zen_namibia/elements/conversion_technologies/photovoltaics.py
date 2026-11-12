@@ -6,7 +6,7 @@ if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
-from zen_namibia.datasets.datasets.namibia_baseline import NamibiaBaseline
+from zen_namibia.datasets.datasets.renewable_plants import load_renewable_plants
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -54,13 +54,13 @@ class Photovoltaics(ConversionTechnology):
         attr = self.conversion_factor  # default value: []
         return attr
 
-    # ---------- Optional method for overriding a default attribute ----------
+    # ---------- Optional methods for applying Renewable Ninja data ----------
+
+    def _set_capacity_limit(self) -> Attribute:
+        return load_renewable_plants(self.source_path).get_capacity_limit(self, "solar")
+
+    def _set_max_load(self) -> Attribute:
+        return load_renewable_plants(self.source_path).get_max_load(self, "solar")
 
     def _set_capacity_existing(self) -> Attribute:
-        """Set the preinstalled (already existing) photovoltaic capacity."""
-        return Attribute(
-            "capacity_existing",
-            default_value=NamibiaBaseline(self.source_path).capacity_existing("omburu_pv_mw"),
-            unit=self.power_unit,
-            element=self,
-        )
+        return load_renewable_plants(self.source_path).get_capacity_existing(self, "solar")
