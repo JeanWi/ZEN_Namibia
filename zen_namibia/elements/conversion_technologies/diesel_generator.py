@@ -57,9 +57,6 @@ class DieselGenerator(ConversionTechnology):
     def _set_conversion_factor(self) -> Attribute:
         """Use Anixas's reported full-load heat rate (about 44.8% efficiency).
 
-        ZEN-garden expects fuel input per unit of electricity output. Anixas
-        operates on HFO; diesel/LFO is used for starting/flashing, so this
-        efficiency applies to HFO fuel energy despite the current carrier name.
         Source: Namibia NIRP Review and Update (2022), Anixas parameters.
         """
         return Attribute(

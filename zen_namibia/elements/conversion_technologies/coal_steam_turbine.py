@@ -15,10 +15,9 @@ from zen_namibia.datasets.datasets.namibia_baseline import load_baseline
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
 LIFETIME = 25
-# Van Eck full-load heat rate from Namibia's 2022 NIRP: 15.81 GJ/MWh_e.
-# The table labels this value MJ/MWh, which is not physically plausible;
-# interpreting it as GJ/MWh is consistent with the report's ~580 kg coal/MWh.
+# Van Eck full-load heat rate from Namibia's 2022 NIRP: 15.81 GJ/MWh_e (580 kg coal/MWh).
 FULL_LOAD_HEAT_RATE_GJ_PER_MWH_E = 15.81
+# MWh of fuel per MWh of electricity: heat rate divided by 3.6 GJ/MWh.
 FUEL_INPUT_PER_ELECTRIC_OUTPUT = FULL_LOAD_HEAT_RATE_GJ_PER_MWH_E / 3.6
 
 
@@ -56,12 +55,11 @@ class CoalSteamTurbine(ConversionTechnology):
         )
 
     def _set_conversion_factor(self) -> Attribute:
-        """Use Van Eck's reported full-load heat rate (about 22.8% efficiency).
+        """Use Van Eck's reported full-load heat rate (about 22% efficiency).
 
-        ZEN-garden expects fuel input per unit of electricity output, so the
-        factor is the heat rate in GJ/MWh_e divided by 3.6 GJ/MWh_fuel.
         The NIRP also reports a lower efficiency at minimum load; this scalar
         assumption represents full-load operation only.
+
         Source: Namibia NIRP Review and Update (2022), Van Eck parameters.
         """
         return Attribute(

@@ -15,9 +15,6 @@ class RenewablePlants(Dataset[pd.DataFrame]):
     name = "renewable_plants"
     steps_per_year = 8760
 
-    def __init__(self, source_path: Path | str | None = None):
-        super().__init__(source_path=source_path)
-
     def _set_metadata(self) -> MetaData:
         return MetaData(
             name=self.name,
@@ -45,7 +42,6 @@ class RenewablePlants(Dataset[pd.DataFrame]):
         ]].copy()
         data["capacity_limit_mw"] = pd.to_numeric(data["capacity_limit_mw"], errors="raise")
         data["capacity_factor_2023_percent"] = pd.to_numeric(data["capacity_factor_2023_percent"], errors="raise")
-        data["capacity_factor_2023"] = data["capacity_factor_2023_percent"] / 100.0
         if data.isna().any().any() or data["plant"].duplicated().any():
             raise ValueError("renewable_plants.csv has blank values or duplicate plant names")
         profile_folder = self.source_path / "renewable_ninja_profiles_2023"
@@ -90,29 +86,6 @@ class RenewablePlants(Dataset[pd.DataFrame]):
             if omburu is not None:
                 capacity += float(omburu["omburu_pv_mw"])
         return capacity
-
-    def weighted_capacity_factor(self, technology: str) -> float:
-        rows = self.data.loc[self.data.technology == technology]
-        weighted_capacity = float(rows.capacity_limit_mw.sum())
-        weighted_output = float((rows.capacity_limit_mw * rows.capacity_factor_2023).sum())
-
-        # Omburu PV is already listed in the capacity table, so read its Renewable
-        # Ninja factor there instead of duplicating the plant in this dataset.
-        if technology == "solar":
-            omburu = self._omburu_reference_year()
-            if omburu is not None:
-                existing_capacity = float(omburu["omburu_pv_mw"])
-                factor = pd.to_numeric(
-                    pd.Series([omburu.get("omburu_pv_capacity_factor_2023_percent")]),
-                    errors="coerce",
-                ).iloc[0]
-                if pd.notna(factor) and existing_capacity > 0:
-                    weighted_capacity += existing_capacity
-                    weighted_output += existing_capacity * float(factor) / 100.0
-
-        if weighted_capacity == 0:
-            return 0.0
-        return weighted_output / weighted_capacity
 
     def get_capacity_limit(self, element: Element, technology: str) -> Attribute:
         """Cap total renewable capacity at the listed 2023 portfolio size."""

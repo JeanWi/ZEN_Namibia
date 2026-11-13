@@ -71,21 +71,19 @@ class ElectricityDemand(Dataset[pd.DataFrame]):
         self.hourly_profile = hourly[["demand_mw"]].copy()
         self.hourly_profile.index = pd.RangeIndex(self.steps_per_year, name="time")
 
-        years_in_model = set(range(int(data.year.min()), int(data.year.max()) + 1))
-        if self.hourly_profile_year not in years_in_model:
+        if self.hourly_profile_year not in set(data["year"]):
             raise ValueError("demands.csv must include year 2023 for the hourly profile")
         return data
 
-    def _demand_by_year(self) -> pd.DataFrame:
-        return self.data.pivot(index="year", columns="node", values="demand_mw")
+    def _profile_for_year(self, year: int) -> pd.DataFrame:
+        rows = self.data.loc[self.data.year == year]
+        if rows.empty:
+            raise ValueError(f"demands.csv has no row for year {year}")
+        row = rows.iloc[0]
+        average_demand_mw = float(row["demand_mw"])
+        energy_consumption_gwh = float(row["energy_consumption_gwh"])
+        peak_demand_mw = float(row["peak_demand_mw"])
 
-    def _profile_for_year(
-        self,
-        year: int,
-        average_demand_mw: float,
-        energy_consumption_gwh: float,
-        peak_demand_mw: float,
-    ) -> pd.DataFrame:
         if year == self.hourly_profile_year:
             demand = self.hourly_profile["demand_mw"].astype(float).copy()
             # Fill the two known zero rows by interpolating across the year boundary.
@@ -113,26 +111,12 @@ class ElectricityDemand(Dataset[pd.DataFrame]):
 
     def get_demand(self, element: Element) -> Attribute:
         """Create the default 8760-hour profile for the configured reference year."""
-        demand_by_year = self._demand_by_year()
         reference_year = read_reference_year(self.source_path)
-        if reference_year not in demand_by_year.index:
-            raise ValueError(
-                f"demands.csv has no row for reference year {reference_year}"
-            )
-        average = float(demand_by_year.loc[reference_year, "NAM"])
-        energy = float(
-            self.data.loc[
-                self.data.year == reference_year, "energy_consumption_gwh"
-            ].iloc[0]
-        )
-        peak = float(
-            self.data.loc[self.data.year == reference_year, "peak_demand_mw"].iloc[0]
-        )
         attr = Attribute("demand", element=element)
         attr.set_data(
             default_value=0.0,
             unit=element.power_unit,
-            df=self._profile_for_year(reference_year, average, energy, peak),
+            df=self._profile_for_year(reference_year),
             source=SourceInformation(
                 description=(
                     f"Hourly electricity demand profile for reference year {reference_year}; "
@@ -146,19 +130,4 @@ class ElectricityDemand(Dataset[pd.DataFrame]):
 
     def get_year_specific_demand(self) -> dict[int, pd.DataFrame]:
         """Return an 8760-step profile for each modeled year."""
-        demand_by_year = self._demand_by_year()
-        return {
-            int(year): self._profile_for_year(
-                int(year),
-                float(values["NAM"]),
-                float(
-                    self.data.loc[
-                        self.data.year == year, "energy_consumption_gwh"
-                    ].iloc[0]
-                ),
-                float(
-                    self.data.loc[self.data.year == year, "peak_demand_mw"].iloc[0]
-                ),
-            )
-            for year, values in demand_by_year.iterrows()
-        }
+        return {int(year): self._profile_for_year(int(year)) for year in self.data["year"]}

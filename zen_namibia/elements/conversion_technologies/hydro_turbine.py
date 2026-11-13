@@ -16,7 +16,6 @@ from zen_namibia.datasets.datasets.namibia_baseline import load_baseline
 # TODO: replace with a real lifetime assumption once available.
 LIFETIME = 25
 RUACANA_ANNUAL_ENERGY_PROXY_GWH = 1323.0
-RUACANA_CAPACITY_MW = 347.0
 HOURS_PER_YEAR = 8760
 
 
@@ -122,15 +121,18 @@ class HydroTurbine(ConversionTechnology):
 
         month_hours = weather["time"].dt.month.value_counts().reindex(range(1, 13), fill_value=0).sort_index()
         target_gwh = RUACANA_ANNUAL_ENERGY_PROXY_GWH
+        capacity_mw = load_baseline(self.source_path).capacity_existing("ruacana_hydro_mw")
 
         def annual_energy(scale: float) -> float:
             fractions = np.minimum(1.0, runoff_index.to_numpy() * scale)
             return float(
-                (fractions * month_hours.to_numpy() * RUACANA_CAPACITY_MW).sum() / 1000.0
+                (fractions * month_hours.to_numpy() * capacity_mw).sum() / 1000.0
             )
 
         if target_gwh > annual_energy(1e12):
-            raise ValueError("Annual hydro energy proxy exceeds the 347 MW plant's physical limit")
+            raise ValueError(
+                f"Annual hydro energy proxy exceeds the {capacity_mw:g} MW plant's physical limit"
+            )
         low, high = 0.0, 1.0
         while annual_energy(high) < target_gwh:
             high *= 2.0

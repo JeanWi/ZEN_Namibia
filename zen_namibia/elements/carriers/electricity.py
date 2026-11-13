@@ -24,14 +24,14 @@ class Electricity(Carrier):
         return ElectricityDemand(self.source_path).get_demand(self)
 
     def _set_availability_import(self) -> Attribute:
-        """Allow imports up to each year's observed annual import volume."""
+        """Leave hourly imports effectively unbounded; the yearly cap below binds."""
         return Attribute(
             "availability_import", default_value=1.0e6, unit=self.power_unit,
             element=self,
         )
 
     def _set_availability_export(self) -> Attribute:
-        """Allow exports up to each year's observed annual export volume."""
+        """Leave hourly exports effectively unbounded; the yearly cap below binds."""
         return Attribute(
             "availability_export", default_value=1.0e6, unit=self.power_unit,
             element=self,
