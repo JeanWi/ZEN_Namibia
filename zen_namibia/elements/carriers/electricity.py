@@ -11,7 +11,6 @@ from zen_creator import Attribute, Carrier
 from zen_namibia.datasets.dataset_collections.electricity_demand import (
     ElectricityDemand,
 )
-from zen_namibia.datasets.datasets.carrier.nampower import NamPower
 
 
 class Electricity(Carrier):

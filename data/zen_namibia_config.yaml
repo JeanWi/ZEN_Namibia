@@ -1,7 +1,7 @@
 # global settings
-source_path: "./source_data"
+source_path: "./data/raw_data"
 
-# all settings in the system.json file with the exception of technology lists
+# all settings in the system.yaml file with the exception of technology lists
 system:
   set_nodes:
     - NAM

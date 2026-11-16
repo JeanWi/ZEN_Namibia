@@ -10,10 +10,7 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-from zen_namibia.datasets.datasets.carrier.nampower import NamPower
-from zen_namibia.datasets.datasets.technology.manual_dispatch_assumptions import (
-    ManualDispatchAssumptions,
-)
+from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.datasets.datasets.technology.renewables_ninja import RenewablesNinja
 from zen_namibia.utils import capacity_existing_df
 
@@ -69,19 +66,23 @@ class HydroTurbine(ConversionTechnology):
 
     def _set_capacity_existing(self) -> Attribute:
         """Set the preinstalled (already existing) hydro turbine capacity."""
-        nampower = NamPower(self.source_path)
-        capacity = nampower.capacity_existing("ruacana_hydro_mw")
+        reference_year = self.config.system.reference_year
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "ruacana_hydro_mw", reference_year
+        )
         return Attribute(
             "capacity_existing",
             default_value=capacity,
             unit=self.power_unit,
             element=self,
-            df=capacity_existing_df(capacity, nampower.reference_year),
+            df=capacity_existing_df(capacity, reference_year),
         )
 
     def _set_capacity_limit(self) -> Attribute:
         """Prevent the 2023 snapshot from expanding the existing hydro fleet."""
-        capacity = NamPower(self.source_path).capacity_existing("ruacana_hydro_mw")
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "ruacana_hydro_mw", self.config.system.reference_year
+        )
         return Attribute(
             "capacity_limit", default_value=capacity,
             unit=self.power_unit, element=self,
@@ -113,7 +114,9 @@ class HydroTurbine(ConversionTechnology):
 
         month_hours = weather["time"].dt.month.value_counts().reindex(range(1, 13), fill_value=0).sort_index()
         target_gwh = RUACANA_ANNUAL_ENERGY_PROXY_GWH
-        capacity_mw = NamPower(self.source_path).capacity_existing("ruacana_hydro_mw")
+        capacity_mw = NamPowerCapacities(self.source_path).capacity_existing(
+            "ruacana_hydro_mw", self.config.system.reference_year
+        )
 
         def annual_energy(scale: float) -> float:
             fractions = np.minimum(1.0, runoff_index.to_numpy() * scale)

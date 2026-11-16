@@ -2,19 +2,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-import numpy as np
-import pandas as pd
-
 if TYPE_CHECKING:
     from zen_creator import Model
 
 from zen_creator import Attribute, ConversionTechnology
 
-from zen_namibia.datasets.datasets.carrier.nampower import NamPower
-from zen_namibia.datasets.datasets.carrier.pypsa import PyPSA
-from zen_namibia.datasets.datasets.technology.manual_dispatch_assumptions import (
-    ManualDispatchAssumptions,
-)
+from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.utils import capacity_existing_df
 
 # MOCK DATA: assumed lifetime of 25 years.
@@ -74,12 +67,14 @@ class DieselGenerator(ConversionTechnology):
 
     def _set_capacity_existing(self) -> Attribute:
         """Set the preinstalled (already existing) diesel generator capacity."""
-        nampower = NamPower(self.source_path)
-        capacity = nampower.capacity_existing("anixas_diesel_mw")
+        reference_year = self.config.system.reference_year
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "anixas_diesel_mw", reference_year
+        )
         return Attribute(
             "capacity_existing",
             default_value=capacity,
             unit=self.power_unit,
             element=self,
-            df=capacity_existing_df(capacity, nampower.reference_year),
+            df=capacity_existing_df(capacity, reference_year),
         )
