@@ -1,7 +1,5 @@
 # global settings
-name: zen-namibia
 source_path: "./source_data"
-output_folder: null
 
 # all settings in the system.json file with the exception of technology lists
 system:
