@@ -8,4 +8,4 @@ coal_variable_om_nirap,1.445,N$/kWh,"NIRP 2022 Table 6 Van Eck VO&M; planning be
 coal_fixed_om_nirap,1692,N$/kW/year,"NIRP 2022 Table 6 Van Eck annual fixed cost; planning benchmark"
 anixas_hfo_price_2020,173.10,N$/GJ,"NIRP 2022 Table 29: assumed delivered HFO price in 2020; proxy, not actual 2023/24 procurement price"
 anixas_fixed_om_nirap,1517,N$/kW/year,"NIRP 2022 Table 7 Anixas annual fixed cost; planning benchmark"
-anixas_variable_om_nirap_per_unit,1.55,N$/kWh,"NIRP 2022 Table 7 lists 3 x N$1.55/kWh; recorded but not applied pending interpretation of the per-unit entry"
+anixas_variable_om_nirap_per_unit,1.55,N$/kWh,"NIRP 2022 Table 7 lists 3 x N$1.55/kWh (three units); applied as N$1.55/kWh because a per-MWh cost is the same for each identical unit; provisional until confirmed with NamPower"

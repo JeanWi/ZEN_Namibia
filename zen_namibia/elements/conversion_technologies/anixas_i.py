@@ -89,6 +89,19 @@ class AnixasI(ConversionTechnology):
             element=self,
         )
 
+    def _set_opex_specific_variable(self) -> Attribute:
+        """Anixas I variable O&M per MWh of electricity (NIRP 2022 Table 7).
+
+        The NIRP lists "3 x N$1.55/kWh" for the three units. A per-MWh cost is
+        the same for each identical unit, so N$1.55/kWh applies station-wide.
+        """
+        return Attribute(
+            "opex_specific_variable",
+            default_value=load_costs(self.source_path).variable_om("anixas_variable_om_nirap_per_unit"),
+            unit="Euro/MWh",
+            element=self,
+        )
+
     def _set_max_load(self) -> Attribute:
         """Cap net electricity output at Anixas I's NIRP value of 21.5 MW."""
         nameplate = NamPowerCapacities(self.source_path).capacity_existing(
