@@ -1,0 +1,7 @@
+item,value,unit,source
+exchange_rate,19.95,N$/EUR,"Assumption: approximate 2023 average (about 18.50 N$/USD x 1.08 USD/EUR); verify against Bank of Namibia before use"
+electricity_import_price,1895,N$/MWh,"NamPower IAR 2023 note 26(a) and IAR 2024 note 26: import cost / import volume; average of FY2022/23 (180.1 c/kWh) and FY2023/24 (198.9 c/kWh)"
+electricity_export_price,859.25,N$/MWh,"NamPower IAR 2023 note 25: SAPP market sales revenue FY2022/23 (N$170,131k) / exports FY2022/23 (198 GWh, imports.csv)"
+coal_price,2236.5,N$/t,"NamPower IAR 2023-2024 key statistics: Van Eck coal cost per tonne; average of FY2022/23 (2227) and FY2023/24 (2246)"
+diesel_price,20.71,N$/L,"Bank of Namibia Quarterly Bulletin June 2024 Table 2.3: Diesel 50ppm pump price, average of 2023 Q1-Q4 (20.65, 19.85, 19.62, 22.72)"
+diesel_energy_content,38.6,MJ/L,"Assumption: standard lower heating value of diesel"

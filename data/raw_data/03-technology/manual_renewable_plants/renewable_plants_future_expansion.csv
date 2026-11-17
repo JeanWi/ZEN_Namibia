@@ -1,0 +1,4 @@
+"plant","technology","capacity_limit_mw","capacity_factor_2023_percent","profile_file","project_category"
+"Gaib Solar","solar","100.0000","28.94","future_expansion/pv_gaib.csv",""
+"Otjikoto Solar Power Station (Maxwell Farm)","solar","10.0000","28.33","future_expansion/pv_otjikoto.csv",""
+"TeraSun Energy Solar Power Station (Arandis)","solar","81.0000","29.28","future_expansion/pv_terasun_arandis.csv",""
