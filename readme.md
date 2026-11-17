@@ -54,7 +54,7 @@ The dataset and output folder names are set in `global_vars.py` and
 - Natural gas is not included until sourced 2023 capacity and fuel data are available.
 - Import/export prices, Van Eck coal price, and Anixas I HFO fuel assumptions are
   read from `data/raw_data/02-carrier/nampower/costs_2023.csv`. Van Eck O&M and
-  Anixas I fixed O&M are included as NIRP benchmarks; other plant O&M and
+  Anixas I O&M are included from the NIRP (2020–2021 values); other plant O&M and
   physical cross-border limits remain incomplete.
 - Electricity trade and fuel supply are unbounded pending verified physical
   limits. Historical annual trade values are used for comparison, not imposed

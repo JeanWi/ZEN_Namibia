@@ -80,13 +80,17 @@ class NamPowerCosts(Dataset[pd.DataFrame]):
         """Convert the NIRP 2020 HFO benchmark to Euro/MWh of fuel."""
         return self.to_euro(self.value("anixas_hfo_price_2020") * 3.6)
 
+    def nirp_to_2023(self) -> float:
+        """CPI factor from the NIRP's 2020 price basis to 2023 prices."""
+        return self.value("cpi_2023") / self.value("cpi_2020")
+
     def variable_om(self, item: str) -> float:
-        """Convert N$/kWh to Euro/MWh of electricity."""
-        return self.to_euro(self.value(item) * 1000.0)
+        """Convert NIRP N$/kWh (2020 prices) to 2023 Euro/MWh of electricity."""
+        return self.to_euro(self.value(item) * 1000.0 * self.nirp_to_2023())
 
     def fixed_om(self, item: str) -> float:
-        """Convert N$/kW/year to Euro/MW/year."""
-        return self.to_euro(self.value(item) * 1000.0)
+        """Convert NIRP N$/kW/year (2020 prices) to 2023 Euro/MW/year."""
+        return self.to_euro(self.value(item) * 1000.0 * self.nirp_to_2023())
 
 @lru_cache(maxsize=None)
 def load_costs(source_path: Path | str) -> NamPowerCosts:
