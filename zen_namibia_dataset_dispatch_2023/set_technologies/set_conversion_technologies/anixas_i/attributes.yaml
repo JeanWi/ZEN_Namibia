@@ -32,10 +32,10 @@ max_load:
   default_value: 0.9555555555555556
   unit: '1'
 opex_specific_variable:
-  default_value: 277.3452122482594
+  default_value: 277.2979534491753
   unit: Euro/MWh
 opex_specific_fixed:
-  default_value: 90480.14773776548
+  default_value: 90464.73018976323
   unit: Euro/MW
 carbon_intensity_technology:
   default_value: 0.0

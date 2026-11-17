@@ -14,10 +14,10 @@ availability_export_yearly:
   default_value: inf
   unit: MWh
 price_import:
-  default_value: 94.9874686716792
+  default_value: 94.97128308959877
   unit: Euro/MWh
 price_export:
-  default_value: 43.07017543859649
+  default_value: 43.06283640883258
   unit: Euro/MWh
 carbon_intensity_carrier_import:
   default_value: 0.0
