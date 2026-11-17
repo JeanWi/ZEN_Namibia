@@ -31,7 +31,7 @@ The dataset and output folder names are set in `global_vars.py` and
   for files, sources and assumptions
 - `zen_namibia/elements/` — carrier, technology and energy-system definitions
   (edit these to change assumptions)
-- `zen_namibia/datasets/datasets/` — one dataset class per source: `carrier/nampower.py` (NamPower demand),
+- `zen_namibia/datasets/datasets/` — one dataset class per source: `carrier/nampower.py` (NamPower demand and `costs_2023.csv`, including the CPI scaling of NIRP O&M and the 2023 HFO price estimate),
   `carrier/pypsa.py` (hourly demand shape), `technology/renewables_ninja.py`
   (wind/solar profiles, hydro weather), `technology/nampower.py` (NamPower
   capacities) and `technology/manual_renewable_plants.py` (own list of
@@ -52,7 +52,7 @@ The dataset and output folder names are set in `global_vars.py` and
   `hourly_demand_2023.csv` is only available for 2023; other years use a flat
   annual-average profile.
 - Natural gas is not included until sourced 2023 capacity and fuel data are available.
-- Import/export prices, Van Eck coal price, and Anixas I HFO fuel assumptions are
+- Import/export prices, Van Eck coal price, and Anixas I estimated 2023 HFO price are
   read from `data/raw_data/02-carrier/nampower/costs_2023.csv`. Van Eck O&M and
   Anixas I O&M are included from the NIRP (2020–2021 values); other plant O&M and
   physical cross-border limits remain incomplete.

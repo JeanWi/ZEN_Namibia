@@ -14,7 +14,7 @@ availability_export_yearly:
   default_value: 0.0
   unit: MWh
 price_import:
-  default_value: 31.23609022556391
+  default_value: 55.30877211642685
   unit: Euro/MWh
 price_export:
   default_value: 0.0

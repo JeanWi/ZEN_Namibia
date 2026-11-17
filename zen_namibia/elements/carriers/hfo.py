@@ -10,7 +10,7 @@ from zen_creator import Attribute, Carrier
 from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 
 class HFO(Carrier):
-    """Heavy fuel oil used by Anixas I (price is a documented 2020 proxy)."""
+    """Heavy fuel oil used by Anixas I (estimated 2023 delivered price)."""
 
     name: str = "hfo"
 

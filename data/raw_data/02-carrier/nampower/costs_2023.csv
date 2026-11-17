@@ -11,3 +11,7 @@ anixas_fixed_om_nirap,1517,N$/kW/year,"NIRP 2022 Table 7 Anixas annual fixed cos
 anixas_variable_om_nirap,4.65,N$/kWh,"NIRP 2022 Table 7: 3 x N$1.55/kWh (station-wide variable O&M), based on 2020-2021 data; excludes fuel"
 cpi_2020,140.6,index (2012=100),"Bank of Namibia Quarterly Bulletin March 2026 (file: march 2026.indb): all-items CPI annual average 2020; price basis of the NIRP O&M values"
 cpi_2023,167.3,index (2012=100),"Bank of Namibia Quarterly Bulletin March 2026 (file: march 2026.indb): all-items CPI annual average 2023; NIRP O&M values are scaled by cpi_2023/cpi_2020 (1.1899)"
+exchange_rate_2020,18.7695,N$/EUR,"Assumption: 2020 average exchange rate; used only to split the NIRP 2020 HFO price into market price and delivery cost; verify against Bank of Namibia"
+hfo_fob_nwe_2020,188.89,EUR/t,"INSEE series 010751333: heavy fuel oil NW Europe 380 cst 3.5% S, cargo FOB, average of the 12 monthly values for 2020"
+hfo_fob_nwe_2023,416.05,EUR/t,"INSEE series 010751333: heavy fuel oil NW Europe 380 cst 3.5% S, cargo FOB, average of the 12 monthly values for 2023 (357.3-530.5)"
+hfo_energy_content,40.6,GJ/t,"Assumption: typical lower heating value of HFO 380 cst"

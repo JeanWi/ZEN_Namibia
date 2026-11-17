@@ -77,8 +77,21 @@ class NamPowerCosts(Dataset[pd.DataFrame]):
         return self.to_euro(self.value("coal_price") / fuel_mwh_per_tonne)
 
     def anixas_hfo_price(self) -> float:
-        """Convert the NIRP 2020 HFO benchmark to Euro/MWh of fuel."""
-        return self.to_euro(self.value("anixas_hfo_price_2020") * 3.6)
+        """Estimate the 2023 delivered HFO price for Anixas in Euro/MWh of fuel.
+
+        The NIRP 2020 delivered price is split into the 2020 market price
+        (NW Europe HFO 380 cst FOB) and a delivery cost (shipping, inland
+        transport, handling, margins). The 2023 price is the 2023 market
+        price plus the 2020 delivery cost scaled to 2023 prices with CPI.
+        """
+        gj_per_tonne = self.value("hfo_energy_content")
+        fob_2020 = self.value("hfo_fob_nwe_2020") / gj_per_tonne * self.value("exchange_rate_2020")
+        delivery_2020 = self.value("anixas_hfo_price_2020") - fob_2020
+        if delivery_2020 <= 0:
+            raise ValueError("NIRP 2020 HFO price must exceed the 2020 FOB market price")
+        fob_2023 = self.value("hfo_fob_nwe_2023") / gj_per_tonne * self.value("exchange_rate")
+        delivered_2023 = fob_2023 + delivery_2020 * self.nirp_to_2023()  # N$/GJ
+        return self.to_euro(delivered_2023 * 3.6)
 
     def nirp_to_2023(self) -> float:
         """CPI factor from the NIRP's 2020 price basis to 2023 prices."""
