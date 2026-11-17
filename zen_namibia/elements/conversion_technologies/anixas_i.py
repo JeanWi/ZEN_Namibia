@@ -7,13 +7,7 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-import numpy as np
-import pandas as pd
-
-from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR, PyPSA
-from zen_namibia.datasets.datasets.technology.manual_dispatch_assumptions import (
-    ManualDispatchAssumptions,
-)
+from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.utils import capacity_existing_df
 
@@ -24,12 +18,13 @@ LIFETIME = 25
 # numerically equal to 8.03 GJ/MWh_e.
 FULL_LOAD_HEAT_RATE_GJ_PER_MWH_E = 8.03
 FUEL_INPUT_PER_ELECTRIC_OUTPUT = FULL_LOAD_HEAT_RATE_GJ_PER_MWH_E / 3.6
+NET_CAPACITY_MW = 21.5
 
 
-class DieselGenerator(ConversionTechnology):
-    """Class containing all data and assumptions for diesel generator."""
+class AnixasI(ConversionTechnology):
+    """Anixas I, represented with HFO fuel and plant-specific O&M costs."""
 
-    name: str = "diesel_generator"
+    name: str = "anixas_i"
 
     def __init__(self, model: Model, power_unit: str = "MW"):
         super().__init__(model=model, power_unit=power_unit)
@@ -37,17 +32,17 @@ class DieselGenerator(ConversionTechnology):
     # ---------- Required methods that are called during object construction ----------
 
     def _set_reference_carrier(self) -> Attribute:
-        """Set the reference carrier of diesel generator  to electricity."""
+        """Set Anixas I's reference carrier to electricity."""
         return Attribute(
             name="reference_carrier", default_value=["electricity"], element=self
         )
 
     def _set_input_carrier(self) -> Attribute:
-        """Use diesel as the plant's fuel input carrier."""
-        return Attribute(name="input_carrier", default_value=["diesel"], element=self)
+        """Use HFO as Anixas I's operating fuel."""
+        return Attribute(name="input_carrier", default_value=["hfo"], element=self)
 
     def _set_output_carrier(self) -> Attribute:
-        """Set the output carrier of diesel generator to electricity."""
+        """Set Anixas I's output carrier to electricity."""
         return Attribute(
             name="output_carrier", default_value=["electricity"], element=self
         )
@@ -66,17 +61,17 @@ class DieselGenerator(ConversionTechnology):
         """
         return Attribute(
             name="conversion_factor",
-            default_value=[{"diesel": {"default_value": FUEL_INPUT_PER_ELECTRIC_OUTPUT, "unit": f"{self.power_unit}h/{self.power_unit}h"}}],
+            default_value=[{"hfo": {"default_value": FUEL_INPUT_PER_ELECTRIC_OUTPUT, "unit": f"{self.power_unit}h/{self.power_unit}h"}}],
             element=self,
         )
 
     # ---------- Optional method for overriding a default attribute ----------
 
     def _set_capacity_existing(self) -> Attribute:
-        """Set the preinstalled (already existing) diesel generator capacity."""
+        """Set Anixas I's existing installed capacity."""
         reference_year = self.config.system.reference_year
         capacity = NamPowerCapacities(self.source_path).capacity_existing(
-            "anixas_diesel_mw", reference_year
+            "anixas_i_mw", reference_year
         )
         return Attribute(
             "capacity_existing",
@@ -86,23 +81,24 @@ class DieselGenerator(ConversionTechnology):
             df=capacity_existing_df(capacity, reference_year),
         )
 
-    def _set_max_load(self) -> Attribute:
-        """Make Anixas available at full output only in the assumed peak hours."""
-        peak_hours = ManualDispatchAssumptions(self.source_path).peak_hours(
-            self.name, STEPS_PER_YEAR
-        )
-        profile = np.zeros(STEPS_PER_YEAR)
-        profile[PyPSA(self.source_path).peak_hours(peak_hours)] = 1.0
+    def _set_opex_specific_fixed(self) -> Attribute:
         return Attribute(
-            "max_load",
-            default_value=1.0,
-            unit="1",
+            "opex_specific_fixed",
+            default_value=load_costs(self.source_path).fixed_om("anixas_fixed_om_nirap"),
+            unit="Euro/MW",
             element=self,
-            df=pd.DataFrame(
-                {"NAM": profile}, index=pd.RangeIndex(STEPS_PER_YEAR, name="time")
-            ),
         )
 
-    def _set_min_full_load_hours_fraction(self) -> Attribute:
-        """Peaking plant: annual minimum from dispatch_assumptions_2023.csv."""
-        return ManualDispatchAssumptions(self.source_path).get_min_full_load_hours_fraction(self)
+    def _set_max_load(self) -> Attribute:
+        """Cap net electricity output at Anixas I's NIRP value of 21.5 MW."""
+        nameplate = NamPowerCapacities(self.source_path).capacity_existing(
+            "anixas_i_mw", self.config.system.reference_year
+        )
+        if nameplate <= 0 or NET_CAPACITY_MW > nameplate:
+            raise ValueError("Anixas I net capacity must be positive and no greater than nameplate")
+        return Attribute(
+            "max_load",
+            default_value=NET_CAPACITY_MW / nameplate,
+            unit="1",
+            element=self,
+        )

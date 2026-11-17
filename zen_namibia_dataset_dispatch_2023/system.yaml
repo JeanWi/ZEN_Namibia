@@ -13,5 +13,5 @@ set_conversion_technologies:
 - photovoltaics
 - onshore_wind_turbine
 - hydro_turbine
-- diesel_generator
+- anixas_i
 - coal_steam_turbine

@@ -5,15 +5,15 @@
     "energy"
   ],
   "set_technologies": [
+    "anixas_i",
     "coal_steam_turbine",
-    "diesel_generator",
     "hydro_turbine",
     "onshore_wind_turbine",
     "photovoltaics"
   ],
   "set_conversion_technologies": [
+    "anixas_i",
     "coal_steam_turbine",
-    "diesel_generator",
     "hydro_turbine",
     "onshore_wind_turbine",
     "photovoltaics"

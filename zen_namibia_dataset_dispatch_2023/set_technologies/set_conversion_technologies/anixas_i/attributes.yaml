@@ -29,13 +29,13 @@ min_load:
   default_value: 0.0
   unit: '1'
 max_load:
-  default_value: 1.0
+  default_value: 0.9555555555555556
   unit: '1'
 opex_specific_variable:
   default_value: 0.0
   unit: Euro/MWh
 opex_specific_fixed:
-  default_value: 0.0
+  default_value: 76040.10025062656
   unit: Euro/MW
 carbon_intensity_technology:
   default_value: 0.0
@@ -48,7 +48,7 @@ max_diffusion_rate:
   unit: '1'
 input_carrier:
   default_value:
-  - diesel
+  - hfo
 output_carrier:
   default_value:
   - electricity
@@ -56,9 +56,9 @@ capex_specific_conversion:
   default_value: 0.0
   unit: Euro/MW
 conversion_factor:
-- diesel:
+- hfo:
     default_value: 2.230555555555555
     unit: MWh/MWh
 min_full_load_hours_fraction:
-  default_value: 0.05
+  default_value: 0.0
   unit: '1'

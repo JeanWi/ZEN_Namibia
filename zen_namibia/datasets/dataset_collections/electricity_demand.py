@@ -41,15 +41,11 @@ class ElectricityDemand(DatasetCollection):
             )
 
         demand = pypsa.data["demand_mw"].astype(float).copy()
-        # The source stores missing hours as 0 MW (22:00 and 23:00 on 31 Dec).
-        # Fill each with the same hour on the previous day.
-        missing = np.flatnonzero(demand.to_numpy() == 0)
-        if (missing < 24).any():
-            raise ValueError("Cannot fill zero demand in the first day of the year")
-        for hour in missing:
-            demand.iloc[hour] = demand.iloc[hour - 24]
-        if demand.eq(0).any():
-            raise ValueError(f"{year} hourly demand still contains zero hours after filling")
+        # Fill the two known zero rows by interpolating across the year boundary.
+        if demand.iloc[-2:].eq(0).all():
+            last_valid, first = demand.iloc[-3], demand.iloc[0]
+            demand.iloc[-2] = last_valid + (first - last_valid) / 3
+            demand.iloc[-1] = last_valid + 2 * (first - last_valid) / 3
         source_mean = float(demand.mean())
         source_peak = float(demand.max())
         target_mean = energy_consumption_gwh * 1000 / STEPS_PER_YEAR

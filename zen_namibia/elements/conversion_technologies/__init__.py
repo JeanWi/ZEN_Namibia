@@ -1,5 +1,5 @@
 from .coal_steam_turbine import CoalSteamTurbine
-from .diesel_generator import DieselGenerator
+from .anixas_i import AnixasI
 from .hydro_turbine import HydroTurbine
 from .onshore_wind_turbine import OnshoreWindTurbine
 from .photovoltaics import Photovoltaics
@@ -9,5 +9,5 @@ __all__ = [
     "CoalSteamTurbine",
     "OnshoreWindTurbine",
     "HydroTurbine",
-    "DieselGenerator",
+    "AnixasI",
 ]

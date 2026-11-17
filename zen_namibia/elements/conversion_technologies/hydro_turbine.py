@@ -10,9 +10,6 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-from zen_namibia.datasets.datasets.technology.manual_dispatch_assumptions import (
-    ManualDispatchAssumptions,
-)
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.datasets.datasets.technology.renewables_ninja import RenewablesNinja
 from zen_namibia.utils import capacity_existing_df
@@ -149,7 +146,3 @@ class HydroTurbine(ConversionTechnology):
             "max_load", default_value=1.0, unit="1", element=self, df=profile
         )
 
-
-    def _set_min_full_load_hours_fraction(self) -> Attribute:
-        """Flexible balancing plant: annual minimum from dispatch_assumptions_2023.csv."""
-        return ManualDispatchAssumptions(self.source_path).get_min_full_load_hours_fraction(self)

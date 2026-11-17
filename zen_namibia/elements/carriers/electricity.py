@@ -11,10 +11,7 @@ from zen_creator import Attribute, Carrier
 from zen_namibia.datasets.dataset_collections.electricity_demand import (
     ElectricityDemand,
 )
-from zen_namibia.datasets.datasets.carrier.nampower import (
-    NamPowerImportsExports,
-    load_costs,
-)
+from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 
 
 class Electricity(Carrier):
@@ -43,18 +40,12 @@ class Electricity(Carrier):
             element=self,
         )
 
-    def _yearly_trade_limit(self, name: str, column: str) -> Attribute:
-        """Cap annual trade at the GWh reported in imports_exports.csv."""
-        return Attribute(
-            name, default_value=0.0, unit=f"{self.power_unit}*h", element=self,
-            df=NamPowerImportsExports(self.source_path).yearly_mwh(column),
-        )
-
-    def _set_availability_import_yearly(self) -> Attribute:
-        return self._yearly_trade_limit("availability_import_yearly", "imports_gwh")
-
     def _set_availability_export_yearly(self) -> Attribute:
-        return self._yearly_trade_limit("availability_export_yearly", "exports_gwh")
+        """Leave annual exports unbounded (the zen-creator default of 0 blocks all exports)."""
+        return Attribute(
+            "availability_export_yearly", default_value=inf, unit=f"{self.power_unit}*h",
+            element=self,
+        )
 
     def _set_price_import(self) -> Attribute:
         return Attribute(

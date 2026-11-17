@@ -7,9 +7,7 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
-from zen_namibia.datasets.datasets.technology.manual_dispatch_assumptions import (
-    ManualDispatchAssumptions,
-)
+from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.utils import capacity_existing_df
 
@@ -18,11 +16,8 @@ from zen_namibia.utils import capacity_existing_df
 LIFETIME = 25
 # Van Eck full-load heat rate from Namibia's 2022 NIRP: 15.81 GJ/MWh_e (580 kg coal/MWh).
 FULL_LOAD_HEAT_RATE_GJ_PER_MWH_E = 15.81
-COAL_TONNES_PER_MWH_E = 0.580
 # MWh of fuel per MWh of electricity: heat rate divided by 3.6 GJ/MWh.
 FUEL_INPUT_PER_ELECTRIC_OUTPUT = FULL_LOAD_HEAT_RATE_GJ_PER_MWH_E / 3.6
-# Energy in one tonne of Van Eck coal (about 7.57 MWh), used to price coal per MWh.
-FUEL_MWH_PER_TONNE = FUEL_INPUT_PER_ELECTRIC_OUTPUT / COAL_TONNES_PER_MWH_E
 
 
 class CoalSteamTurbine(ConversionTechnology):
@@ -103,6 +98,18 @@ class CoalSteamTurbine(ConversionTechnology):
             element=self,
         )
 
-    def _set_min_full_load_hours_fraction(self) -> Attribute:
-        """Emergency standby: annual minimum from dispatch_assumptions_2023.csv."""
-        return ManualDispatchAssumptions(self.source_path).get_min_full_load_hours_fraction(self)
+    def _set_opex_specific_variable(self) -> Attribute:
+        return Attribute(
+            "opex_specific_variable",
+            default_value=load_costs(self.source_path).variable_om("coal_variable_om_nirap"),
+            unit="Euro/MWh",
+            element=self,
+        )
+
+    def _set_opex_specific_fixed(self) -> Attribute:
+        return Attribute(
+            "opex_specific_fixed",
+            default_value=load_costs(self.source_path).fixed_om("coal_fixed_om_nirap"),
+            unit="Euro/MW",
+            element=self,
+        )

@@ -34,8 +34,5 @@ class NamPowerCapacities(Dataset[pd.DataFrame]):
         return rows.iloc[0]
 
     def capacity_existing(self, column: str, year: int) -> float:
-        """Return one non-negative value (MW or GWh) of a capacity column in a year."""
-        value = pd.to_numeric(self.capacities_in(year)[column], errors="raise")
-        if pd.isna(value) or float(value) < 0:
-            raise ValueError(f"capacities.csv {column!r} must be a non-negative number for {year}")
-        return float(value)
+        """Return the installed capacity in MW of one capacity column in a year."""
+        return float(self.capacities_in(year)[column])

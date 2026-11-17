@@ -71,14 +71,22 @@ class NamPowerCosts(Dataset[pd.DataFrame]):
     def electricity_price(self, direction: str) -> float:
         return self.to_euro(self.value(f"electricity_{direction}_price"))
 
-    def coal_price(self, fuel_mwh_per_tonne: float) -> float:
-        """Euro per MWh of coal energy, from the N$ per tonne cost."""
+    def coal_price(self) -> float:
+        # Fuel MWh per tonne from the NIRP heat rate and coal use.
+        fuel_mwh_per_tonne = (15.81 / 3.6) / (580.0 / 1000.0)
         return self.to_euro(self.value("coal_price") / fuel_mwh_per_tonne)
 
-    def diesel_price(self) -> float:
-        fuel_mwh_per_litre = self.value("diesel_energy_content") / 1000.0 / 3.6
-        return self.to_euro(self.value("diesel_price") / fuel_mwh_per_litre)
+    def anixas_hfo_price(self) -> float:
+        """Convert the NIRP 2020 HFO benchmark to Euro/MWh of fuel."""
+        return self.to_euro(self.value("anixas_hfo_price_2020") * 3.6)
 
+    def variable_om(self, item: str) -> float:
+        """Convert N$/kWh to Euro/MWh of electricity."""
+        return self.to_euro(self.value(item) * 1000.0)
+
+    def fixed_om(self, item: str) -> float:
+        """Convert N$/kW/year to Euro/MW/year."""
+        return self.to_euro(self.value(item) * 1000.0)
 
 @lru_cache(maxsize=None)
 def load_costs(source_path: Path | str) -> NamPowerCosts:
@@ -86,38 +94,11 @@ def load_costs(source_path: Path | str) -> NamPowerCosts:
     return NamPowerCosts(source_path)
 
 
-class NamPowerImportsExports(Dataset[pd.DataFrame]):
-    """NamPower annual electricity imports and exports 2019-2025 (GWh)."""
-
-    name = "nampower_imports_exports"
-
-    def _set_metadata(self) -> MetaData:
-        return nampower_metadata(self.name)
-
-    def _set_path(self) -> Path:
-        return self.source_path / "02-carrier" / "nampower" / "imports_exports.csv"
-
-    def _set_data(self) -> pd.DataFrame:
-        data = pd.read_csv(self.path)
-        missing = {"year", "imports_gwh", "exports_gwh"}.difference(data.columns)
-        if missing:
-            raise ValueError(
-                "imports_exports.csv is missing columns: " + ", ".join(sorted(missing))
-            )
-        data["year"] = pd.to_numeric(data["year"], errors="raise").astype(int)
-        if data["year"].duplicated().any():
-            raise ValueError("imports_exports.csv has duplicate years")
-        return data
-
-    def yearly_mwh(self, column: str) -> pd.DataFrame:
-        """Return one GWh column as MWh per year for the single node NAM."""
-        return self.data.set_index("year")[[column]].rename(columns={column: "NAM"}) * 1000
-
-
 class NamPowerDemand(Dataset[pd.DataFrame]):
     """NamPower annual electricity demand 2019-2025.
 
-    The files are in ``02-carrier/nampower/``.
+    The files are in ``02-carrier/nampower/``. ``imports_exports.csv`` is kept
+    there as well but is not used by the model at the moment.
     """
 
     name = "nampower_demand"

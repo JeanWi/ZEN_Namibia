@@ -1,9 +1,9 @@
 from .coal import Coal
-from .diesel import Diesel
+from .hfo import HFO
 from .electricity import Electricity
 
 __all__ = [
     "Electricity",
     "Coal",
-    "Diesel",
+    "HFO",
 ]
