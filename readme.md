@@ -35,7 +35,7 @@ The dataset and output folder names are set in `global_vars.py` and
   (edit these to change assumptions)
 - `zen_namibia/datasets/datasets/` — one dataset class per source: `carrier/nampower.py` (NamPower demand and `costs_2023.csv`, including the CPI scaling of NIRP O&M and the 2023 HFO price estimate),
   `carrier/pypsa.py` (hourly demand shape), `carrier/sapp.py` (SAPP monthly
-  market prices), `technology/renewables_ninja.py`
+  time-of-use market prices), `technology/renewables_ninja.py`
   (wind/solar profiles, hydro weather), `technology/nampower.py` (NamPower
   capacities), `technology/sapp.py` (SAPP interconnector transfer limits) and `technology/manual_renewable_plants.py` (own list of
   wind/solar plants).
@@ -66,8 +66,9 @@ The dataset and output folder names are set in `global_vars.py` and
   Africa and 428 MW Zimbabwe–Zambia (Kariba) (SAPP transfer limits) and
   300 MW Zambia (Caprivi Link rating). Neighbour nodes have no demand or
   plants. Imports are capped per hour at the ZESCO (180 MW) and ZPC (80 MW)
-  contract sizes in `import_contracts.csv`. South Africa (SAPP market and Eskom) trades at the 2023 monthly
-  SAPP day-ahead price; Zambia and Zimbabwe (ZESCO, ZPC contracts) at
+  contract sizes in `import_contracts.csv`. South Africa (SAPP market and Eskom) trades at the 2023 SAPP
+  day-ahead price by time of use (each month's off-peak, standard and peak
+  price, mapped to hours with Eskom's Megaflex periods); Zambia and Zimbabwe (ZESCO, ZPC contracts) at
   NamPower's average import price. Exports earn the SAPP price, capped at the
   contract import price so contract imports cannot be resold. Fuel supply is
   unbounded. Historical annual trade values are used for comparison, not

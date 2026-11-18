@@ -81,13 +81,13 @@ class Electricity(Carrier):
         )
 
     def _sapp_price(self) -> np.ndarray:
-        """Monthly SAPP day-ahead market price for every hour of the year."""
+        """Hourly SAPP day-ahead price: each month's off-peak, standard or peak price."""
         return SAPPMarketPrices(self.source_path).hourly_euro_per_mwh(
             self.config.system.reference_year
         )
 
     def _set_price_import(self) -> Attribute:
-        """South Africa (SAPP market, Eskom) buys at the monthly SAPP price;
+        """South Africa (SAPP market, Eskom) buys at the hourly SAPP time-of-use price;
         Zambia and Zimbabwe (ZESCO, ZPC contracts) at NamPower's average import price."""
         contract = load_costs(self.source_path).electricity_price("import")
         return self._hourly_prices(
@@ -95,11 +95,10 @@ class Electricity(Carrier):
         )
 
     def _set_price_export(self) -> Attribute:
-        """Exports are sold at the monthly SAPP price, capped at the contract import price.
+        """Exports are sold at the hourly SAPP price, capped at the contract import price.
 
         The cap stops the model from buying contract power from Zambia or
-        Zimbabwe and reselling it into SAPP when the market is dearer
-        (September to November 2023).
+        Zimbabwe and reselling it into SAPP when the market is dearer.
         """
         contract = load_costs(self.source_path).electricity_price("import")
         export = np.minimum(self._sapp_price(), contract)
