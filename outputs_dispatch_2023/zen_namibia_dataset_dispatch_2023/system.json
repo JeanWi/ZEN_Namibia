@@ -9,7 +9,8 @@
     "coal_steam_turbine",
     "hydro_turbine",
     "onshore_wind_turbine",
-    "photovoltaics"
+    "photovoltaics",
+    "power_line"
   ],
   "set_conversion_technologies": [
     "anixas_i",
@@ -22,16 +23,33 @@
   "set_retrofitting_technologies": [],
   "storage_periodicity": true,
   "multiyear_periodicity": false,
-  "set_transport_technologies": [],
+  "set_transport_technologies": [
+    "power_line"
+  ],
   "set_transport_technologies_loss_exponential": [],
   "double_capex_transport": false,
   "set_nodes": [
-    "NAM"
+    "NAM",
+    "ZAF",
+    "ZMB",
+    "ZWE"
   ],
   "coords": {
     "NAM": {
       "lon": 17.0658,
       "lat": -22.5609
+    },
+    "ZAF": {
+      "lon": 28.1881,
+      "lat": -25.7461
+    },
+    "ZMB": {
+      "lon": 28.2833,
+      "lat": -15.4167
+    },
+    "ZWE": {
+      "lon": 31.0522,
+      "lat": -17.8292
     }
   },
   "exclude_parameters_from_TSA": true,

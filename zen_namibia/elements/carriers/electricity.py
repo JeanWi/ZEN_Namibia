@@ -6,12 +6,21 @@ from math import inf
 if TYPE_CHECKING:
     from zen_creator import Model
 
+import numpy as np
+import pandas as pd
 from zen_creator import Attribute, Carrier
 
 from zen_namibia.datasets.dataset_collections.electricity_demand import (
     ElectricityDemand,
 )
 from zen_namibia.datasets.datasets.carrier.nampower import load_costs
+from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR
+from zen_namibia.datasets.datasets.carrier.sapp import SAPPMarketPrices
+from zen_namibia.elements.energy_systems.energy_system_namibia import (
+    DOMESTIC_NODE,
+    NODES,
+    SAPP_MARKET_NODE,
+)
 
 
 class Electricity(Carrier):
@@ -26,19 +35,25 @@ class Electricity(Carrier):
         """Set the hourly electricity demand (PyPSA shape, NamPower totals)."""
         return ElectricityDemand(self.source_path).get_demand(self)
 
-    def _set_availability_import(self) -> Attribute:
-        """Leave hourly imports effectively unbounded. Todo: this should become line limit"""
+    def _no_trade_at_domestic_node(self, name: str) -> Attribute:
+        """Trade only at the neighbour nodes; Namibia reaches them via power_line.
+
+        The neighbour nodes stay unbounded, so the hourly limit on Namibia's
+        imports and exports is the power_line capacity (SAPP transfer limits).
+        """
         return Attribute(
-            "availability_import", default_value=inf, unit=self.power_unit,
-            element=self,
+            name, default_value=inf, unit=self.power_unit, element=self,
+            df=pd.DataFrame(
+                {DOMESTIC_NODE: np.zeros(STEPS_PER_YEAR)},
+                index=pd.RangeIndex(STEPS_PER_YEAR, name="time"),
+            ),
         )
 
+    def _set_availability_import(self) -> Attribute:
+        return self._no_trade_at_domestic_node("availability_import")
+
     def _set_availability_export(self) -> Attribute:
-        """Leave hourly exports effectively unbounded. Todo: this should become line limit"""
-        return Attribute(
-            "availability_export", default_value=inf, unit=self.power_unit,
-            element=self,
-        )
+        return self._no_trade_at_domestic_node("availability_export")
 
     def _set_availability_export_yearly(self) -> Attribute:
         """Leave annual exports unbounded (the zen-creator default of 0 blocks all exports)."""
@@ -47,18 +62,37 @@ class Electricity(Carrier):
             element=self,
         )
 
-    def _set_price_import(self) -> Attribute:
+    def _hourly_prices(self, name: str, default: float, by_node: dict[str, np.ndarray]) -> Attribute:
         return Attribute(
-            "price_import",
-            default_value=load_costs(self.source_path).electricity_price("import"),
-            unit=f"Euro/({self.power_unit}*h)",
+            name, default_value=default, unit=f"Euro/({self.power_unit}*h)",
             element=self,
+            df=pd.DataFrame(by_node, index=pd.RangeIndex(STEPS_PER_YEAR, name="time")),
+        )
+
+    def _sapp_price(self) -> np.ndarray:
+        """Monthly SAPP day-ahead market price for every hour of the year."""
+        return SAPPMarketPrices(self.source_path).hourly_euro_per_mwh(
+            self.config.system.reference_year
+        )
+
+    def _set_price_import(self) -> Attribute:
+        """South Africa (SAPP market, Eskom) buys at the monthly SAPP price;
+        Zambia and Zimbabwe (ZESCO, ZPC contracts) at NamPower's average import price."""
+        contract = load_costs(self.source_path).electricity_price("import")
+        return self._hourly_prices(
+            "price_import", contract, {SAPP_MARKET_NODE: self._sapp_price()}
         )
 
     def _set_price_export(self) -> Attribute:
-        return Attribute(
-            "price_export",
-            default_value=load_costs(self.source_path).electricity_price("export"),
-            unit=f"Euro/({self.power_unit}*h)",
-            element=self,
+        """Exports are sold at the monthly SAPP price, capped at the contract import price.
+
+        The cap stops the model from buying contract power from Zambia or
+        Zimbabwe and reselling it into SAPP when the market is dearer
+        (September to November 2023).
+        """
+        contract = load_costs(self.source_path).electricity_price("import")
+        export = np.minimum(self._sapp_price(), contract)
+        neighbours = NODES.index.drop(DOMESTIC_NODE)
+        return self._hourly_prices(
+            "price_export", 0.0, {node: export for node in neighbours}
         )

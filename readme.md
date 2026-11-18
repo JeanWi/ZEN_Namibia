@@ -1,8 +1,10 @@
 # ZEN Namibia
 
 ZEN-garden model of the Namibian electricity system, built with zen-creator.
-The current setup is a fixed-fleet 2023 dispatch snapshot (one node, 8,760 hours,
-no investment).
+The current setup is a fixed-fleet 2023 dispatch snapshot (8,760 hours, no
+investment) with four nodes: Namibia (`NAM`) and its neighbours South Africa
+(`ZAF`), Zambia (`ZMB`) and Zimbabwe (`ZWE`), joined by cross-border power
+lines. Zimbabwe connects to Namibia only through Zambia.
 
 ## Setup
 
@@ -32,9 +34,10 @@ The dataset and output folder names are set in `global_vars.py` and
 - `zen_namibia/elements/` — carrier, technology and energy-system definitions
   (edit these to change assumptions)
 - `zen_namibia/datasets/datasets/` — one dataset class per source: `carrier/nampower.py` (NamPower demand and `costs_2023.csv`, including the CPI scaling of NIRP O&M and the 2023 HFO price estimate),
-  `carrier/pypsa.py` (hourly demand shape), `technology/renewables_ninja.py`
+  `carrier/pypsa.py` (hourly demand shape), `carrier/sapp.py` (SAPP monthly
+  market prices), `technology/renewables_ninja.py`
   (wind/solar profiles, hydro weather), `technology/nampower.py` (NamPower
-  capacities) and `technology/manual_renewable_plants.py` (own list of
+  capacities), `technology/sapp.py` (SAPP interconnector transfer limits) and `technology/manual_renewable_plants.py` (own list of
   wind/solar plants).
 - `zen_namibia/datasets/dataset_collections/` — combine several sources:
   `electricity_demand.py` (PyPSA shape scaled to NamPower totals) and
@@ -56,12 +59,16 @@ The dataset and output folder names are set in `global_vars.py` and
   read from `data/raw_data/02-carrier/nampower/costs_2023.csv`. Van Eck O&M and
   Anixas I O&M are included from the NIRP (2020–2021 values); other plant O&M and
   physical cross-border limits remain incomplete.
-- Electricity trade and fuel supply are unbounded pending verified physical
-  limits. Historical annual trade values are used for comparison, not imposed
-  as model caps. Fuel and trade prices are nonzero and influence dispatch.
-- Imports and exports are native electricity-carrier boundary flows at the
-  single Namibia node. There is no export-link technology or neighboring
-  country node in this configuration.
+- Electricity is imported and exported only at the `ZAF`, `ZMB` and `ZWE`
+  nodes and reaches Namibia through the `power_line` transport technology,
+  whose capacity per direction is the SAPP transfer limit (575 MW South
+  Africa, 180 MW Zambia, 428 MW Zimbabwe–Zambia via Kariba). Neighbour nodes have no demand or plants; their trade is
+  unbounded. South Africa (SAPP market and Eskom) trades at the 2023 monthly
+  SAPP day-ahead price; Zambia and Zimbabwe (ZESCO, ZPC contracts) at
+  NamPower's average import price. Exports earn the SAPP price, capped at the
+  contract import price so contract imports cannot be resold. Fuel supply is
+  unbounded. Historical annual trade values are used for comparison, not
+  imposed as model caps.
 
 ## Troubleshooting
 

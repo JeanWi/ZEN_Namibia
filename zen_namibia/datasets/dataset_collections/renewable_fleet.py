@@ -87,7 +87,7 @@ class RenewableFleet(DatasetCollection):
         capacity = self.existing_capacity_mw(technology, reference_year)
         return Attribute(
             "capacity_existing",
-            default_value=capacity,
+            default_value=0.0,
             unit=element.power_unit,
             element=element,
             df=capacity_existing_df(capacity, reference_year),

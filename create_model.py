@@ -11,6 +11,7 @@ from zen_namibia.elements import (  # noqa: F401
     carriers,
     conversion_technologies,
     energy_systems,
+    transport_technologies,
 )
 
 CONFIG_PATH = Path(__file__).resolve().parent / "data" / "zen_namibia_config.yaml"

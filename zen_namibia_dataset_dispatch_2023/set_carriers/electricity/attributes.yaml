@@ -17,7 +17,7 @@ price_import:
   default_value: 94.97128308959877
   unit: Euro/MWh
 price_export:
-  default_value: 43.06283640883258
+  default_value: 0.0
   unit: Euro/MWh
 carbon_intensity_carrier_import:
   default_value: 0.0

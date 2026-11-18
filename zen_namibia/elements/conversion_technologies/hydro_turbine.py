@@ -72,7 +72,7 @@ class HydroTurbine(ConversionTechnology):
         )
         return Attribute(
             "capacity_existing",
-            default_value=capacity,
+            default_value=0.0,
             unit=self.power_unit,
             element=self,
             df=capacity_existing_df(capacity, reference_year),
