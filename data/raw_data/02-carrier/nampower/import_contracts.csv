@@ -1,0 +1,5 @@
+supplier,node,contract_type,contract_mw,non_firm_mw,start,end,imports_2023_gwh,cap_in_model,source
+ZESCO,ZMB,firm,180,,2020,,1478,yes,"100 MW agreement (2020) plus 80 MW (April 2022); reported as a 10-year firm contract (Lusaka Times and The Brief, January 2023)"
+ZPC,ZWE,ppa,80,,2015,2030,330,yes,"15-year 80 MW power purchase agreement from April 2015, tied to financing the Kariba South expansion (NewsDay and Southern Eye, October 2014)"
+ESKOM,ZAF,firm,100,300,2017,2025,466,no,"100 MW firm plus up to 300 MW non-firm when available; ends 2025, extendable to 2027 (Republikein, April 2024); not capped in the model because Eskom and SAPP market trade share the ZAF node, limited by the 575 MW interconnector"
+SAPP,ZAF,market,,,,,210,no,"SAPP day-ahead market purchases; no contract; priced at the monthly SAPP price"

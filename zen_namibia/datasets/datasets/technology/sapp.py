@@ -12,6 +12,7 @@ LIMIT_COLUMNS = [
     "voltage_kv",
     "number_of_lines",
     "applicable_transfer_limit_mw",
+    "model_limit_mw",
 ]
 
 
@@ -57,26 +58,28 @@ class SAPPTransferLimits(Dataset[pd.DataFrame]):
         if not flags.isin(["yes", "no"]).all():
             raise ValueError("interconnectors.csv in_model must be yes or no")
         data = raw.loc[flags == "yes"].copy()
-        data["applicable_transfer_limit_mw"] = pd.to_numeric(
-            data["applicable_transfer_limit_mw"], errors="raise"
-        )
+        for column in ["applicable_transfer_limit_mw", "model_limit_mw"]:
+            data[column] = pd.to_numeric(data[column], errors="raise")
         if data[LIMIT_COLUMNS].isna().any().any():
             raise ValueError("interconnectors.csv has blank values in a modeled interconnector")
-        if (data["applicable_transfer_limit_mw"] <= 0).any():
+        if (data[["applicable_transfer_limit_mw", "model_limit_mw"]] <= 0).any().any():
             raise ValueError("interconnectors.csv has non-positive transfer limits")
         if (data["node_from"] == data["node_to"]).any():
             raise ValueError("interconnectors.csv has a line starting and ending at the same node")
         return data
 
     def edge_capacities(self) -> pd.Series:
-        """Transfer limit per directed edge in MW, summing parallel lines.
+        """Model transfer limit per directed edge in MW, summing parallel lines.
+
+        Uses `model_limit_mw`, which equals the SAPP applicable limit unless
+        the source column documents a reason to differ.
 
         SAPP lists each line in one direction only (into Namibia, and Zambia to
         Zimbabwe for Kariba). The same limit is assumed for the reverse
         direction unless that direction is listed.
         """
         listed = self.data.groupby(["node_from", "node_to"])[
-            "applicable_transfer_limit_mw"
+            "model_limit_mw"
         ].sum()
         capacities = {
             edge_name(node_from, node_to): limit

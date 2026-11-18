@@ -60,11 +60,13 @@ The dataset and output folder names are set in `global_vars.py` and
   and Ruacana O&M come from the NIRP (2020–2021 values); NIRP values are scaled to
   2023 prices with CPI. PV and wind fixed O&M come from IRENA (PV 2023 survey,
   wind Africa 2021) and are not CPI-scaled, because these costs have fallen.
-- Electricity is imported and exported only at the `ZAF`, `ZMB` and `ZWE`
-  nodes and reaches Namibia through the `power_line` transport technology,
-  whose capacity per direction is the SAPP transfer limit (575 MW South
-  Africa, 180 MW Zambia, 428 MW Zimbabwe–Zambia via Kariba). Neighbour nodes have no demand or plants; their trade is
-  unbounded. South Africa (SAPP market and Eskom) trades at the 2023 monthly
+- Electricity is imported only at the `ZAF`, `ZMB` and `ZWE` nodes and
+  exported only at `ZAF` (SAPP sales). It reaches Namibia through the
+  `power_line` transport technology, limited per direction to 575 MW South
+  Africa and 428 MW Zimbabwe–Zambia (Kariba) (SAPP transfer limits) and
+  300 MW Zambia (Caprivi Link rating). Neighbour nodes have no demand or
+  plants. Imports are capped per hour at the ZESCO (180 MW) and ZPC (80 MW)
+  contract sizes in `import_contracts.csv`. South Africa (SAPP market and Eskom) trades at the 2023 monthly
   SAPP day-ahead price; Zambia and Zimbabwe (ZESCO, ZPC contracts) at
   NamPower's average import price. Exports earn the SAPP price, capped at the
   contract import price so contract imports cannot be resold. Fuel supply is
