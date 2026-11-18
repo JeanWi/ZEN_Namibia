@@ -6,19 +6,28 @@
   ```
   
 ## Current scope
-- **Model:** fixed-fleet 2023 dispatch snapshot (8,760 hours, no investment). Dispatch is cost-driven; manual dispatch assumptions have been removed. Historical annual trade volumes are stored for comparison but are not enforced as limits.
-- **Nodes:** Namibia (NAM) holds all demand and plants. Its neighbours South Africa (ZAF), Zambia (ZMB) and Zimbabwe (ZWE) only trade electricity. Zimbabwe connects only through Zambia. Angola (400 kV Kunene–Cahama link, planned) and Botswana (distribution-level links) are listed in `interconnectors.csv` but not modeled.
-- **Interconnectors:** the power_line transport technology, limited per direction to the SAPP transfer limits: 575 MW South Africa–Namibia, 180 MW Zambia–Namibia, 428 MW Zambia–Zimbabwe (Kariba). Export-direction limits are assumed equal. A €0.01/MWh wheeling cost only stops looped flows; line losses are not modeled.
-- **Trade prices:** South Africa (SAPP market, Eskom) trades at the 2023 monthly SAPP day-ahead price (€38–192/MWh); Zambia and Zimbabwe (ZESCO, ZPC contracts) at NamPower's average import price (€95/MWh), because per-contract prices are not published. Exports earn the SAPP price capped at €95/MWh, so contract imports are not resold. Annual trade and fuel imports are unbounded; the yearly export limit is set explicitly to unbounded, because zen-creator's default of 0 blocks all exports.
-- **Plant costs:** Van Eck and Anixas I fixed and variable O&M come from the NIRP 2022 report (2020–2021 data), scaled to 2023 prices with the Bank of Namibia CPI (167.3/140.6 = 1.1899); NIRP variable O&M excludes fuel. Anixas I variable O&M is "3 x N$1.55/kWh", applied as N$4.65/kWh. Van Eck coal costs N$2,227/t (NamPower FY2022/23). Anixas I uses an estimated 2023 delivered HFO price of N$306.5/GJ: the 2023 NW Europe FOB market price (INSEE) plus the NIRP 2020 delivery cost scaled with CPI. Exchange rates are Bank of Namibia annual averages: 19.9534 N$/EUR (2023) and 18.7695 N$/EUR (2020). Ruacana fixed O&M is the NIRP 2022 Table 5 value (N$1,020/kW-year, scaled to 2023 with CPI); PV and wind fixed O&M are IRENA (2021) Africa benchmarks (US$13 and US$68/kW-year in 2020 USD), converted and scaled the same way; renewable variable O&M is zero.
-- **Fleet:** existing renewable capacity is limited to the 2023 roster; the future-expansion list is not included.
 
-## Current results (objective €204.16M)
-- **Van Eck** (about €151/MWh) runs 38.1 GWh, all in November, when SAPP costs €192/MWh and the Zambia line is full; NamPower reported 44.3 GWh (FY2023/24).
-- **Anixas I** (about €400/MWh) is never cheaper than imports and runs 0 GWh, against 5–6 GWh reported (FY2022/23 and FY2023/24); monthly prices are too smooth to capture its short emergency runs.
-- **Imports:** 1,809 GWh via South Africa (peak 573 MW, below the 575 MW limit) and 388 GWh via Zambia (September–November only, at the 180 MW limit for 2,027 hours); Zimbabwe supplies nothing, because its route crosses two lines at the same price as Zambia. NamPower actually bought about 676 GWh from Eskom and SAPP and 1,808 GWh from ZESCO and ZPC: SAPP is cheaper than the contract price in most months, and contract volumes (take-or-pay) are not modeled.
-- **Exports:** 11.6 GWh of renewable surplus, against 198 GWh reported (FY2022/23).
-- **Domestic generation:** hydro 1,323 GWh, PV 480.1 GWh, wind 27.9 GWh.
+Details and sources are in `data/raw_data/README.md`.
+
+- **Model:** fixed 2023 fleet, 8,760 hours, no investment; cost-driven dispatch, no manual dispatch rules or trade caps.
+- **Nodes:** Namibia (all demand and plants) plus South Africa, Zambia and Zimbabwe (trade only; Zimbabwe via Zambia). Angola and Botswana are listed but not modeled.
+- **Interconnectors:** SAPP transfer limits: 575 MW South Africa, 180 MW Zambia, 428 MW Kariba (Zambia–Zimbabwe); no line losses.
+- **Trade prices:** South Africa at the 2023 monthly SAPP price (€38–192/MWh); Zambia and Zimbabwe at NamPower's average import price (€95/MWh). Exports earn the SAPP price, capped at €95/MWh.
+- **Fuel and O&M:** coal N$2,227/t; HFO about N$306.5/GJ (2023 estimate). Thermal and Ruacana O&M from NIRP 2022, scaled to 2023 with CPI. PV (US$6.2/kW-yr, IRENA 2023) and wind (US$68/kW-yr, IRENA Africa) fixed O&M are not CPI-scaled, because these costs have fallen.
+- **Exchange rates:** 19.9534 N$/EUR (2023) and 18.7695 N$/EUR (2020), Bank of Namibia.
+
+## Current results (objective €202.78M)
+
+| Item | Model | NamPower reported |
+|---|---|---|
+| Van Eck | 38.1 GWh (November) | 44.3 GWh |
+| Anixas I | 0 GWh | 5–6 GWh |
+| Imports via South Africa / Zambia / Zimbabwe | 1,809 / 388 / 0 GWh | Eskom + SAPP 676, ZESCO + ZPC 1,808 GWh |
+| Exports | 11.6 GWh | 198 GWh |
+| Ruacana hydro | 1,323 GWh | 1,323 GWh (FY2023; model calibrated to it) |
+| PV / wind | 480.1 / 27.9 GWh | not reported by NamPower (mostly IPPs) |
+
+The import split differs because SAPP is cheaper than the contract price in most months and contract volumes are not modeled.
 
 ## Next steps
 1. Verify NIRP plant O&M assumptions against NamPower data; check whether NamPower's IPP contract prices for PV and wind are available, since NamPower pays those rather than the IRENA O&M benchmarks. The NIRP variable O&M excludes fuel, so fuel and O&M are modeled as separate costs.

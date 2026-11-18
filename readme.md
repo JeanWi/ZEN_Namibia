@@ -57,8 +57,9 @@ The dataset and output folder names are set in `global_vars.py` and
 - Natural gas is not included until sourced 2023 capacity and fuel data are available.
 - Import/export prices, Van Eck coal price, and Anixas I estimated 2023 HFO price are
   read from `data/raw_data/02-carrier/nampower/costs_2023.csv`. Van Eck, Anixas I
-  and Ruacana O&M come from the NIRP (2020–2021 values); PV and wind fixed O&M
-  from IRENA (2021, 2020 USD). All are scaled to 2023 prices with CPI.
+  and Ruacana O&M come from the NIRP (2020–2021 values); NIRP values are scaled to
+  2023 prices with CPI. PV and wind fixed O&M come from IRENA (PV 2023 survey,
+  wind Africa 2021) and are not CPI-scaled, because these costs have fallen.
 - Electricity is imported and exported only at the `ZAF`, `ZMB` and `ZWE`
   nodes and reaches Namibia through the `power_line` transport technology,
   whose capacity per direction is the SAPP transfer limit (575 MW South

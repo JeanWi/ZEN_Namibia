@@ -67,13 +67,13 @@ class OnshoreWindTurbine(ConversionTechnology):
         return RenewableFleet(self.source_path).get_capacity_existing(self, "wind")
 
     def _set_opex_specific_fixed(self) -> Attribute:
-        """Onshore wind fixed O&M per MW per year (IRENA 2021, 2020 USD, scaled to 2023).
+        """Onshore wind fixed O&M per MW per year (IRENA 2021 Africa, US$68, unscaled).
 
         Variable O&M is taken as zero.
         """
         return Attribute(
             "opex_specific_fixed",
-            default_value=load_costs(self.source_path).usd_2020_fixed_om("wind_fixed_om_irena"),
+            default_value=load_costs(self.source_path).usd_fixed_om("wind_fixed_om_irena"),
             unit=f"Euro/{self.power_unit}",
             element=self,
         )

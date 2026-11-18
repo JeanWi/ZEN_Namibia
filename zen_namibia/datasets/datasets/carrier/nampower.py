@@ -105,17 +105,13 @@ class NamPowerCosts(Dataset[pd.DataFrame]):
         """Convert NIRP N$/kW/year (2020 prices) to 2023 Euro/MW/year."""
         return self.to_euro(self.value(item) * 1000.0 * self.nirp_to_2023())
 
-    def usd_2020_fixed_om(self, item: str) -> float:
-        """Convert USD/kW/year (2020 prices) to 2023 Euro/MW/year.
+    def usd_fixed_om(self, item: str) -> float:
+        """Convert a 2023 USD/kW/year O&M value to Euro/MW/year.
 
-        Same route as the NIRP costs: to N$ at the 2020 N$/USD rate
-        (exchange_rate_2020 / usd_per_eur_2020), to 2023 prices with CPI,
-        then to Euro at the 2023 rate.
+        Uses the 2023 USD/EUR rate only. IRENA's technology O&M costs are
+        not scaled with Namibian CPI, because they have fallen over time.
         """
-        nad_per_usd_2020 = self.value("exchange_rate_2020") / self.value("usd_per_eur_2020")
-        return self.to_euro(
-            self.value(item) * 1000.0 * nad_per_usd_2020 * self.nirp_to_2023()
-        )
+        return self.value(item) * 1000.0 / self.value("usd_per_eur_2023")
 
 @lru_cache(maxsize=None)
 def load_costs(source_path: Path | str) -> NamPowerCosts:
