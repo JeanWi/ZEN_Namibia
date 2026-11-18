@@ -15,3 +15,7 @@ exchange_rate_2020,18.7695,N$/EUR,"Bank of Namibia (bon.com.na): 2020 annual ave
 hfo_fob_nwe_2020,188.89,EUR/t,"INSEE series 010751333: heavy fuel oil NW Europe 380 cst 3.5% S, cargo FOB, average of the 12 monthly values for 2020"
 hfo_fob_nwe_2023,416.05,EUR/t,"INSEE series 010751333: heavy fuel oil NW Europe 380 cst 3.5% S, cargo FOB, average of the 12 monthly values for 2023 (357.3-530.5)"
 hfo_energy_content,40.6,GJ/t,"Assumption: typical lower heating value of HFO 380 cst"
+hydro_fixed_om_nirap,1020,N$/kW/year,"NIRP 2022 Table 5 Ruacana annual fixed cost; NIRP 2022 report, based on 2020-2021 data; variable O&M not applied"
+pv_fixed_om_irena,13,USD/kW/year,"IRENA (2021) Planning and Prospects for Renewable Power: Africa, Solar PV (utility) fixed O&M, 2020 USD; as used in the TMP (2023) least-cost study for Namibia, Table 2; variable O&M taken as zero"
+wind_fixed_om_irena,68,USD/kW/year,"IRENA (2021) Planning and Prospects for Renewable Power: Africa, onshore wind fixed O&M, 2020 USD; as used in the TMP (2023) least-cost study for Namibia, Table 2; variable O&M taken as zero"
+usd_per_eur_2020,1.1421961089494,USD/EUR,"ECB euro reference rate, 2020 annual average (EXR.A.USD.EUR.SP00.A); with exchange_rate_2020 gives the 2020 N$/USD rate used to convert IRENA 2020 USD costs"

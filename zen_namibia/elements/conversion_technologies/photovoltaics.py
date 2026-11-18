@@ -7,6 +7,7 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
+from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.dataset_collections.renewable_fleet import RenewableFleet
 
 # MOCK DATA: assumed lifetime of 25 years.
@@ -65,3 +66,15 @@ class Photovoltaics(ConversionTechnology):
 
     def _set_capacity_existing(self) -> Attribute:
         return RenewableFleet(self.source_path).get_capacity_existing(self, "solar")
+
+    def _set_opex_specific_fixed(self) -> Attribute:
+        """Utility PV fixed O&M per MW per year (IRENA 2021, 2020 USD, scaled to 2023).
+
+        Variable O&M is taken as zero.
+        """
+        return Attribute(
+            "opex_specific_fixed",
+            default_value=load_costs(self.source_path).usd_2020_fixed_om("pv_fixed_om_irena"),
+            unit=f"Euro/{self.power_unit}",
+            element=self,
+        )

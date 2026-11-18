@@ -10,6 +10,7 @@ if TYPE_CHECKING:
 
 from zen_creator import Attribute, ConversionTechnology
 
+from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.datasets.datasets.technology.renewables_ninja import RenewablesNinja
 from zen_namibia.utils import capacity_existing_df
@@ -146,3 +147,11 @@ class HydroTurbine(ConversionTechnology):
             "max_load", default_value=1.0, unit="1", element=self, df=profile
         )
 
+    def _set_opex_specific_fixed(self) -> Attribute:
+        """Ruacana fixed O&M per MW per year (NIRP 2022 Table 5, scaled to 2023 with CPI)."""
+        return Attribute(
+            "opex_specific_fixed",
+            default_value=load_costs(self.source_path).fixed_om("hydro_fixed_om_nirap"),
+            unit=f"Euro/{self.power_unit}",
+            element=self,
+        )

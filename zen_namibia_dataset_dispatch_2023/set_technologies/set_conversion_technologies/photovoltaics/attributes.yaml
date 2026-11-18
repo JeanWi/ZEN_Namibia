@@ -35,7 +35,7 @@ opex_specific_variable:
   default_value: 0.0
   unit: Euro/MWh
 opex_specific_fixed:
-  default_value: 0.0
+  default_value: 12739.403430725179
   unit: Euro/MW
 carbon_intensity_technology:
   default_value: 0.0
