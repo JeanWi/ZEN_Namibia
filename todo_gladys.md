@@ -30,8 +30,9 @@ Details and sources are in `data/raw_data/README.md`.
 The import split differs because SAPP is cheaper than the contract price in most months and contract volumes are not modeled.
 
 ## Next steps
-1. Verify NIRP plant O&M assumptions against NamPower data; check whether NamPower's IPP contract prices for PV and wind are available, since NamPower pays those rather than the IRENA O&M benchmarks. The NIRP variable O&M excludes fuel, so fuel and O&M are modeled as separate costs.
-2. Refine trade: source per-contract import prices for Eskom, ZESCO and ZPC (only NamPower's average is public) and contract volumes or take-or-pay terms, so the split of imports between the neighbours becomes meaningful (Zimbabwe currently supplies nothing); consider hourly SAPP prices instead of monthly averages; add Angola (400 kV Kunene–Cahama link, planned but not built) and Botswana (distribution-level links only; 0.4 GWh from BPC in 2023) if they become relevant; confirm the SAPP limits' date and the export-direction limits; add line losses. Note that 2023 imports via Zambia (ZESCO 1,478 GWh plus ZPC 330 GWh, about 206 MW on average) exceed what the 180 MW SAPP limit allows over a year (1,577 GWh), so check whether part of this energy is wheeled through South Africa or the Caprivi Link (300 MW HVDC) carries more.
-3. Replace the estimated 2023 delivered HFO price with NamPower's actual procurement price if it becomes available, and check whether Anixas I burns HFO or VLSFO; confirm the trade-price inputs.
-4. Compare modeled calendar-year 2023 generation and trade against observed values; keep fiscal-year figures labeled as proxies.
-5. Rebuild and solve after the remaining inputs are sourced, then review dispatch and energy balance.
+1. **Import contracts:** source per-contract prices and volumes (take-or-pay) for Eskom, ZESCO and ZPC, so the import split matches NamPower's (Zimbabwe now supplies nothing).
+2. **Hourly SAPP prices:** replace the monthly averages, so short price spikes can trigger Anixas I (0 GWh modeled, 5–6 GWh reported).
+3. **Exports:** find why the model exports 11.6 GWh against 198 GWh reported (export price cap, contract resale, timing).
+4. **Zambia link:** 2023 imports via Zambia (1,808 GWh) exceed what 180 MW allows in a year (1,577 GWh); check wheeling via South Africa or the Caprivi Link's 300 MW rating. Confirm the date of the SAPP limits and the export-direction limits.
+5. **Fuel and plant costs:** replace the estimated HFO price with NamPower's actual price (HFO or VLSFO?); verify the NIRP O&M with NamPower; look for IPP contract prices for PV and wind.
+6. **Later:** line losses; Angola (Kunene–Cahama, planned) and Botswana links if they become relevant.
