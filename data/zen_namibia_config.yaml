@@ -12,6 +12,8 @@ system:
   unaggregated_time_steps_per_year: 8760
   aggregated_time_steps_per_year: 8760
   conduct_time_series_aggregation: false
+  # Optimize more years for demand growth (NIRP 2.7%/yr after 2025), e.g.
+  # optimized_years: 2 with interval_between_years: 7 gives 2023 and 2030.
   optimized_years: 1
   interval_between_years: 1
   use_rolling_horizon: false

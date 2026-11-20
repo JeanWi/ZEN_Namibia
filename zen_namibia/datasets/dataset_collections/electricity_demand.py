@@ -9,11 +9,17 @@ from zen_creator import Attribute, Dataset, DatasetCollection, Element
 from zen_creator.utils.attribute import SourceInformation
 
 from zen_namibia.datasets.datasets.carrier.nampower import NamPowerDemand
+from zen_namibia.datasets.datasets.carrier.nirp import NIRPDemandGrowth
 from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR, PyPSA
 
 
 class ElectricityDemand(DatasetCollection):
-    """Hourly demand: the PyPSA shape scaled to NamPower's annual energy and peak."""
+    """Hourly demand: the PyPSA shape scaled to NamPower's annual energy and peak.
+
+    Later optimized years scale the whole hourly profile by a yearly factor:
+    NamPower's reported energy where available (demand.csv), otherwise the
+    last reported year grown at the NIRP 2022 rate (2.7% per year).
+    """
 
     name = "electricity_demand"
 
@@ -24,7 +30,35 @@ class ElectricityDemand(DatasetCollection):
         return {
             "nampower_demand": NamPowerDemand(self.source_path),
             "pypsa": PyPSA(self.source_path),
+            "nirp_growth": NIRPDemandGrowth(self.source_path),
         }
+
+    def energy_gwh(self, year: int) -> float:
+        """Annual energy demand: NamPower actual if reported, else NIRP growth
+        from the last reported year."""
+        reported = self.data["nampower_demand"].data.set_index("year")[
+            "energy_consumption_gwh"
+        ]
+        if year in reported.index:
+            return float(reported[year])
+        if year < reported.index.min():
+            raise ValueError(f"No demand data or projection before {reported.index.min()}")
+        last = int(reported.index.max())
+        rate = self.data["nirp_growth"].annual_growth_rate()
+        return float(reported[last]) * (1.0 + rate) ** (year - last)
+
+    def yearly_variation(self, element: Element) -> pd.DataFrame:
+        """Demand in each optimized year relative to the reference year."""
+        system = element.config.system
+        years = [
+            system.reference_year + i * system.interval_between_years
+            for i in range(system.optimized_years)
+        ]
+        base = self.energy_gwh(system.reference_year)
+        return pd.DataFrame(
+            {"NAM": [self.energy_gwh(year) / base for year in years]},
+            index=pd.Index(years, name="year"),
+        )
 
     def _profile_for_year(self, year: int) -> pd.DataFrame:
         """Scale the PyPSA data to NamPower's data."""
@@ -74,12 +108,15 @@ class ElectricityDemand(DatasetCollection):
             default_value=0.0,
             unit=element.power_unit,
             df=self._profile_for_year(reference_year),
+            yearly_variations_df=self.yearly_variation(element),
             source=SourceInformation(
                 description=(
                     "Hourly electricity demand profile for reference year "
                     f"{reference_year}; PyPSA hourly shape calibrated to NamPower "
                     f"annual energy and peak for {profile_year}, flat annual "
-                    "average otherwise."
+                    "average otherwise. Later optimized years scale the profile "
+                    "with NamPower reported energy, then NIRP 2022 growth of "
+                    "2.7% per year."
                 ),
                 metadata=self.metadata,
             ),
