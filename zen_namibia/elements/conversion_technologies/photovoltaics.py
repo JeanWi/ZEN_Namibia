@@ -9,6 +9,11 @@ from zen_creator import Attribute, ConversionTechnology
 
 from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.dataset_collections.renewable_fleet import RenewableFleet
+from zen_namibia.datasets.datasets.technology.expansion import (
+    committed_projects,
+    investment_costs,
+)
+from zen_namibia.utils import capacity_lower_limit_attribute, capacity_limit_attribute
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -59,7 +64,29 @@ class Photovoltaics(ConversionTechnology):
     # ---------- Optional methods for applying Renewable Ninja data ----------
 
     def _set_capacity_limit(self) -> Attribute:
-        return RenewableFleet(self.source_path).get_capacity_limit(self, "solar")
+        """2023 fleet in the reference year; unlimited new capacity in Namibia later."""
+        existing = RenewableFleet(self.source_path).existing_capacity_mw(
+            "solar", self.config.system.reference_year
+        )
+        return capacity_limit_attribute(self, existing, expandable=True)
+
+    def _set_capacity_lower_limit(self) -> Attribute:
+        """2023 fleet plus committed projects online by each later year."""
+        existing = RenewableFleet(self.source_path).existing_capacity_mw(
+            "solar", self.config.system.reference_year
+        )
+        projects = committed_projects(self.source_path)
+        return capacity_lower_limit_attribute(
+            self, existing, lambda year: projects.committed_by(self.name, year)
+        )
+
+    def _set_capex_specific_conversion(self) -> Attribute:
+        """Capex per MW from NamPower's own project cost (investment_costs.csv)."""
+        return Attribute(
+            "capex_specific_conversion",
+            default_value=investment_costs(self.source_path).capex_euro_per_mw(self.name),
+            unit=f"Euro/{self.power_unit}", element=self,
+        )
 
     def _set_max_load(self) -> Attribute:
         return RenewableFleet(self.source_path).get_max_load(self, "solar")

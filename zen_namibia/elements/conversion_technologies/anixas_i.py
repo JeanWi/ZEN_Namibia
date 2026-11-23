@@ -9,7 +9,7 @@ from zen_creator import Attribute, ConversionTechnology
 
 from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
-from zen_namibia.utils import capacity_existing_df
+from zen_namibia.utils import capacity_existing_df, capacity_limit_attribute
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -80,6 +80,13 @@ class AnixasI(ConversionTechnology):
             element=self,
             df=capacity_existing_df(capacity, reference_year),
         )
+
+    def _set_capacity_limit(self) -> Attribute:
+        """No new Anixas I capacity (new engines are engine_power_plant): capped at the existing plant in Namibia, zero elsewhere."""
+        capacity = NamPowerCapacities(self.source_path).capacity_existing(
+            "anixas_i_mw", self.config.system.reference_year
+        )
+        return capacity_limit_attribute(self, capacity, expandable=False)
 
     def _set_opex_specific_fixed(self) -> Attribute:
         return Attribute(

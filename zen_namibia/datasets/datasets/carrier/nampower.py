@@ -113,6 +113,29 @@ class NamPowerCosts(Dataset[pd.DataFrame]):
         """
         return self.value(item) * 1000.0 / self.value("usd_per_eur_2023")
 
+class NamPowerTrade(Dataset[pd.DataFrame]):
+    """NamPower's annual imports and exports (imports_exports.csv)."""
+
+    name = "nampower_trade"
+
+    def _set_metadata(self) -> MetaData:
+        return nampower_metadata(self.name)
+
+    def _set_path(self) -> Path:
+        return self.source_path / "02-carrier" / "nampower" / "imports_exports.csv"
+
+    def _set_data(self) -> pd.DataFrame:
+        data = pd.read_csv(self.path)
+        if not {"year", "exports_gwh"}.issubset(data.columns):
+            raise ValueError("imports_exports.csv needs year and exports_gwh columns")
+        return data.set_index("year")
+
+    def latest_exports_gwh(self) -> tuple[int, float]:
+        """Exports in the latest reported year."""
+        year = int(self.data.index.max())
+        return year, float(self.data.loc[year, "exports_gwh"])
+
+
 @lru_cache(maxsize=None)
 def load_costs(source_path: Path | str) -> NamPowerCosts:
     """Load and cache the NamPower 2023 cost inputs for a source folder."""

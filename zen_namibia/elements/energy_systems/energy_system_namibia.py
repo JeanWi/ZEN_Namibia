@@ -8,6 +8,7 @@ if TYPE_CHECKING:
 import pandas as pd
 from zen_creator import Attribute, EnergySystem
 
+from zen_namibia.datasets.datasets.technology.expansion import expansion_assumptions
 from zen_namibia.datasets.datasets.technology.sapp import SAPPTransferLimits
 
 # Namibia plus the neighbouring systems it trades with. Namibia holds
@@ -36,6 +37,14 @@ class EnergySystemNamibia(EnergySystem):
 
     def __init__(self, model: Model):
         super().__init__(model=model)
+
+    def _set_discount_rate(self) -> Attribute:
+        """8% real (assumption; NamPower does not disclose its WACC)."""
+        return Attribute(
+            "discount_rate",
+            default_value=expansion_assumptions(self.source_path).value("discount_rate"),
+            unit="1", element=self,
+        )
 
     def _set_set_nodes(self) -> Attribute:
         return Attribute("set_nodes", default_value=None, df=NODES, element=self)

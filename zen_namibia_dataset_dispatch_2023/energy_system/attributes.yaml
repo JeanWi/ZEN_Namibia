@@ -17,7 +17,7 @@ carbon_emissions_cumulative_existing:
   default_value: 0.0
   unit: gigatons
 discount_rate:
-  default_value: 0.05
+  default_value: 0.08
   unit: '1'
 knowledge_spillover_rate:
   default_value: inf

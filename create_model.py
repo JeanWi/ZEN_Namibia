@@ -11,6 +11,7 @@ from zen_namibia.elements import (  # noqa: F401
     carriers,
     conversion_technologies,
     energy_systems,
+    storage_technologies,
     transport_technologies,
 )
 

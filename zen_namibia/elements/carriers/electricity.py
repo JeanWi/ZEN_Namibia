@@ -15,6 +15,7 @@ from zen_namibia.datasets.dataset_collections.electricity_demand import (
 )
 from zen_namibia.datasets.datasets.carrier.nampower import (
     NamPowerImportContracts,
+    NamPowerTrade,
     load_costs,
 )
 from zen_namibia.datasets.datasets.carrier.pypsa import STEPS_PER_YEAR
@@ -24,6 +25,7 @@ from zen_namibia.elements.energy_systems.energy_system_namibia import (
     NODES,
     SAPP_MARKET_NODE,
 )
+from zen_namibia.utils import model_years
 
 
 class Electricity(Carrier):
@@ -67,10 +69,25 @@ class Electricity(Carrier):
         return self._hourly_limits("availability_export", {node: 0.0 for node in no_export})
 
     def _set_availability_export_yearly(self) -> Attribute:
-        """Leave annual exports unbounded (the zen-creator default of 0 blocks all exports)."""
+        """Annual exports: unbounded in the reference year (calibrated 2023 run);
+        in later years capped at NamPower's latest reported exports (539 GWh in
+        2025), so that new capacity is built for Namibia and hydrogen, not for
+        sales into SAPP at a fixed price. (The zen-creator default of 0 blocks
+        all exports.)"""
+        _, exports_gwh = NamPowerTrade(self.source_path).latest_exports_gwh()
+        reference_year = self.config.system.reference_year
+        years = model_years(self)
+        df = pd.DataFrame(
+            {"availability_export_yearly": [
+                inf if year == reference_year else exports_gwh * 1000.0 for year in years
+            ]},
+            index=pd.MultiIndex.from_tuples(
+                [(SAPP_MARKET_NODE, year) for year in years], names=["node", "year"]
+            ),
+        )
         return Attribute(
             "availability_export_yearly", default_value=inf, unit=f"{self.power_unit}*h",
-            element=self,
+            element=self, df=df,
         )
 
     def _hourly_prices(self, name: str, default: float, by_node: dict[str, np.ndarray]) -> Attribute:

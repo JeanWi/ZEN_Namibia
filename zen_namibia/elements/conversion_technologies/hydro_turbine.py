@@ -13,7 +13,7 @@ from zen_creator import Attribute, ConversionTechnology
 from zen_namibia.datasets.datasets.carrier.nampower import load_costs
 from zen_namibia.datasets.datasets.technology.nampower import NamPowerCapacities
 from zen_namibia.datasets.datasets.technology.renewables_ninja import RenewablesNinja
-from zen_namibia.utils import capacity_existing_df
+from zen_namibia.utils import capacity_existing_df, capacity_limit_attribute
 
 # MOCK DATA: assumed lifetime of 25 years.
 # TODO: replace with a real lifetime assumption once available.
@@ -80,14 +80,11 @@ class HydroTurbine(ConversionTechnology):
         )
 
     def _set_capacity_limit(self) -> Attribute:
-        """Prevent the 2023 snapshot from expanding the existing hydro fleet."""
+        """No new hydro: capped at Ruacana in Namibia, zero elsewhere."""
         capacity = NamPowerCapacities(self.source_path).capacity_existing(
             "ruacana_hydro_mw", self.config.system.reference_year
         )
-        return Attribute(
-            "capacity_limit", default_value=capacity,
-            unit=self.power_unit, element=self,
-        )
+        return capacity_limit_attribute(self, capacity, expandable=False)
 
     def _set_max_load(self) -> Attribute:
         """Set monthly hydro availability from smoothed local rainfall.

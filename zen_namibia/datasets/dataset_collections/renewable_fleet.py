@@ -103,8 +103,14 @@ class RenewableFleet(DatasetCollection):
             ],
         )
 
-    def get_max_load(self, element: Element, technology: str) -> Attribute:
-        """Capacity-weight hourly plant profiles into the technology's max_load."""
+    def get_max_load(
+        self, element: Element, technology: str,
+        target_capacity_factor: float | None = None,
+    ) -> Attribute:
+        """Capacity-weight hourly plant profiles into the technology's max_load.
+
+        If target_capacity_factor is given, the weighted profile is scaled to
+        that annual mean (capped at 1)."""
         ninja = self.data["renewables_ninja"]
         rows = self.data["manual_renewable_plants"].plants(technology)
         if rows.empty:
@@ -136,6 +142,10 @@ class RenewableFleet(DatasetCollection):
             )
             / total_capacity
         )
+        if target_capacity_factor is not None:
+            weighted_profile = (
+                weighted_profile * target_capacity_factor / float(weighted_profile.mean())
+            ).clip(upper=1.0)
         if len(weighted_profile) != STEPS_PER_YEAR:
             raise ValueError(f"{technology} profile must contain 8,760 hourly values")
         profile = pd.DataFrame(
@@ -153,7 +163,12 @@ class RenewableFleet(DatasetCollection):
                     description=(
                         f"Hourly 2023 Renewables.ninja power profiles for the "
                         f"{technology} plants, normalized by each profile's "
-                        "simulated capacity and weighted by installed capacity."
+                        "simulated capacity and weighted by installed capacity"
+                        + (
+                            f", scaled to a {target_capacity_factor:.1%} annual "
+                            "capacity factor."
+                            if target_capacity_factor is not None else "."
+                        )
                     ),
                     metadata=self.metadata,
                 )

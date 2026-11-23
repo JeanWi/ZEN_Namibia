@@ -66,6 +66,14 @@ class PowerLine(TransportTechnology):
             element=self, df=df,
         )
 
+    def _set_capacity_limit(self) -> Attribute:
+        """No new line capacity: each edge is capped at its existing limit."""
+        capacities = SAPPTransferLimits(self.source_path).edge_capacities()
+        df = pd.DataFrame({"capacity_limit": capacities.to_numpy()}, index=capacities.index)
+        return Attribute(
+            "capacity_limit", default_value=0.0, unit=self.power_unit, element=self, df=df,
+        )
+
     def _set_opex_specific_variable(self) -> Attribute:
         """Tiny wheeling cost so the solver does not route power in loops.
 

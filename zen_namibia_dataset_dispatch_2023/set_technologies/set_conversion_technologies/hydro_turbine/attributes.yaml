@@ -20,7 +20,7 @@ capacity_existing:
   default_value: 0.0
   unit: MW
 capacity_limit:
-  default_value: 347.0
+  default_value: 0.0
   unit: MW
 capacity_lower_limit:
   default_value: 0.0
