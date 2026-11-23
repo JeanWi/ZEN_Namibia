@@ -16,7 +16,7 @@ Details and sources: `data/raw_data/README.md`.
 - **Costs:** coal, estimated HFO price, NIRP and IRENA O&M, in 2023 euros.
 
 ## Current results
-2023 + 2030 with hydrogen solved to optimum (objective €1.70 bn) but Gurobi ran out of memory before writing results: rerun with more free memory. Table below is the earlier 2023-only run (objective €197.88M).
+2023 + 2030 with hydrogen: objective €1.70 bn (results in `outputs_dispatch_2023/`). 2030: PV 3,658 MW, wind 366 MW, electrolyser 1,958 MW, hydrogen storage 7,389 MWh; imports 2,558 GWh, of which ~2,281 GWh while electrolysers run (no-imports-for-hydrogen rule not yet enforced); exports 539 GWh (at cap). Table below is the earlier 2023-only run (objective €197.88M).
 
 | Item | Model (GWh) | NamPower (GWh) |
 |---|---|---|
@@ -30,7 +30,7 @@ Details and sources: `data/raw_data/README.md`.
 ## Next steps
 1. **Anixas I:** never runs (€400/MWh vs SAPP peak ≤ €229/MWh); it runs in real shortages, which the model lacks (SA imports unlimited up to the line). Also confirm SAPP's time-of-use hours (Eskom's assumed).
 2. **Exports:** model exports only domestic surplus (11.6 GWh). NamPower's 198 GWh (FY2022/23) is mostly contract imports it could not use, resold to SAPP, which the model does not represent. For future years: revisit the €95/MWh export price cap and SAPP export limits.
-3. **Zambia link:** confirm 300 MW (SAPP lists 180 MW).
+3. **Zambia link:** 300 MW confirmed (IAR 2023 p. 22). The ZLI carried 1,396 GWh in FY2022/23, but the model routes only 603 GWh via Zambia (contracts at €95/MWh lose to off-peak SAPP via South Africa).
 4. **Costs:** actual HFO price; check NIRP O&M; ZESCO and ZPC contract prices; IPP contract prices for PV and wind.
 5. **Demand growth:** check 2.7% in the NIRP 2022 itself (Ch. 3, App. A2).
 6. **Hydrogen:** rerun and read results; check the no-imports-for-hydrogen rule (compare 2030 imports with a run without hydrogen, add an import cap if they rise); verify the 69% electrolyser efficiency (IEA); add ammonia synthesis and desalination electricity; existing PV/wind are charged capex in 2023 (+€15.5M).

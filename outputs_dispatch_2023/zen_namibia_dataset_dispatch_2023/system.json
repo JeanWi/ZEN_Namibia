@@ -6,20 +6,31 @@
   ],
   "set_technologies": [
     "anixas_i",
+    "biomass_power_plant",
     "coal_steam_turbine",
+    "electrolyser",
+    "engine_power_plant",
     "hydro_turbine",
     "onshore_wind_turbine",
     "photovoltaics",
-    "power_line"
+    "power_line",
+    "battery",
+    "hydrogen_storage"
   ],
   "set_conversion_technologies": [
     "anixas_i",
+    "biomass_power_plant",
     "coal_steam_turbine",
+    "electrolyser",
+    "engine_power_plant",
     "hydro_turbine",
     "onshore_wind_turbine",
     "photovoltaics"
   ],
-  "set_storage_technologies": [],
+  "set_storage_technologies": [
+    "battery",
+    "hydrogen_storage"
+  ],
   "set_retrofitting_technologies": [],
   "storage_periodicity": true,
   "multiyear_periodicity": false,
@@ -62,12 +73,12 @@
   "unaggregated_time_steps_per_year": 8760,
   "aggregated_time_steps_per_year": 8760,
   "conduct_time_series_aggregation": false,
-  "optimized_years": 1,
-  "interval_between_years": 1,
+  "optimized_years": 2,
+  "interval_between_years": 7,
   "use_rolling_horizon": false,
   "years_in_rolling_horizon": 1,
   "years_in_decision_horizon": 1,
   "use_capacities_existing": true,
-  "allow_investment": false,
+  "allow_investment": true,
   "storage_charge_discharge_binary": false
 }
