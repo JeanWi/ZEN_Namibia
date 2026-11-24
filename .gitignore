@@ -2,3 +2,5 @@ __pycache__/
 *.pyc
 # written by run_zen_garden.py with machine-specific absolute paths
 config_dispatch_2023.yaml
+gurobi_nodefiles/
+euler/logs/*.out

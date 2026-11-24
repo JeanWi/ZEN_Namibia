@@ -80,6 +80,13 @@ The dataset and output folder names are set in `global_vars.py` and
   unbounded. Historical annual trade values are used for comparison, not
   imposed as model caps.
 
+## Running on ETH Euler
+
+1. On a login node, clone the repository and run `bash euler/setup_env.sh` once. It creates a Python environment in `~/venvs/zen_namibia`.
+2. If a module in `euler/modules.sh` is missing, check `module avail python` / `module avail gurobi` and edit that file.
+3. Submit with `sbatch euler/run.sbatch` from the repository root. The job builds the dataset and solves (8 cores, 64 GB, 24 h; Gurobi uses all 8 cores).
+4. Follow with `squeue -u $USER`; the log is in `euler/logs/`. Copy `outputs_dispatch_2023/` back with `scp -r` or commit it from Euler.
+
 ## Troubleshooting
 
 - If Python exits with Windows exception `0xc06d007f` inside `numpy.linalg`, reinstall NumPy in the active `ZEN-garden` environment (`conda install --force-reinstall numpy`).
